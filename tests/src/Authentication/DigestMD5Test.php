@@ -181,6 +181,18 @@ class DigestMD5Test extends TestCase
      * @uses Fabiang\Sasl\Options
      * @uses Fabiang\Sasl\Authentication\AbstractAuthentication::__construct
      */
+    public function testGetResponseWithResponseAuth()
+    {
+        $this->assertEquals('', $this->object->createResponse('rspauth=12345'));
+    }
+
+    /**
+     * @expectedException \Fabiang\Sasl\Exception\InvalidArgumentException
+     * @covers ::createResponse
+     * @covers ::parseChallenge
+     * @uses Fabiang\Sasl\Options
+     * @uses Fabiang\Sasl\Authentication\AbstractAuthentication::__construct
+     */
     public function testGetResponseInvalidChallenge()
     {
         $this->object->createResponse('invalid_challenge');

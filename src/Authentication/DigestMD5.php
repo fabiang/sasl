@@ -140,10 +140,6 @@ class DigestMD5 extends AbstractAuthentication implements ChallengeAuthenticatio
             $challenge = substr($challenge, strlen($match) + 1);
         }
 
-        if(isset($tokens['rspauth'])) {
-            return $tokens;
-        }
-
         // Required: nonce, algorithm
         if ((empty($tokens['nonce']) || empty($tokens['algorithm'])) && !empty($tokens['rspauth'])) {
             return array();
