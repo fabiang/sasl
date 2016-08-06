@@ -66,43 +66,48 @@ class DigestMD5 extends AbstractAuthentication implements ChallengeAuthenticatio
         $authzid  = $this->options->getAuthzid();
         $service  = $this->options->getService();
         $hostname = $this->options->getHostname();
+
         if (!empty($authzid)) {
             $authzidString = 'authzid="' . $authzid . '",';
         }
 
-        if (!empty($parsedChallenge)) {
-            $cnonce         = $this->generateCnonce();
-            $digestUri      = sprintf('%s/%s', $service, $hostname);
-            $responseValue = $this->getResponseValue(
-                $authcid,
-                $pass,
-                $parsedChallenge['realm'],
-                $parsedChallenge['nonce'],
-                $cnonce,
-                $digestUri,
-                $authzid
-            );
-
-            $realm  = '';
-            if ($parsedChallenge['realm']) {
-                $realm = 'realm="' . $parsedChallenge['realm'] . '",';
-            }
-
-            return sprintf(
-                'username="%s",%s%snonce="%s",cnonce="%s",nc=00000001,qop=auth,digest-uri="%s",'
-                . 'response=%s,maxbuf=%d',
-                $authcid,
-                $realm,
-                $authzidString,
-                $parsedChallenge['nonce'],
-                $cnonce,
-                $digestUri,
-                $responseValue,
-                $parsedChallenge['maxbuf']
-            );
+        if (empty($parsedChallenge)) {
+            throw new InvalidArgumentException('Invalid digest challenge');    
         }
 
-        throw new InvalidArgumentException('Invalid digest challenge');
+        if (isset($parsedChallenge['rspauth'])) {
+            return '';
+        }
+
+        $cnonce         = $this->generateCnonce();
+        $digestUri      = sprintf('%s/%s', $service, $hostname);
+        $responseValue = $this->getResponseValue(
+            $authcid,
+            $pass,
+            $parsedChallenge['realm'],
+            $parsedChallenge['nonce'],
+            $cnonce,
+            $digestUri,
+            $authzid
+        );
+
+        $realm  = '';
+        if ($parsedChallenge['realm']) {
+            $realm = 'realm="' . $parsedChallenge['realm'] . '",';
+        }
+
+        return sprintf(
+            'username="%s",%s%snonce="%s",cnonce="%s",nc=00000001,qop=auth,digest-uri="%s",'
+            . 'response=%s,maxbuf=%d',
+            $authcid,
+            $realm,
+            $authzidString,
+            $parsedChallenge['nonce'],
+            $cnonce,
+            $digestUri,
+            $responseValue,
+            $parsedChallenge['maxbuf']
+        );
     }
 
     /**
@@ -135,8 +140,12 @@ class DigestMD5 extends AbstractAuthentication implements ChallengeAuthenticatio
             $challenge = substr($challenge, strlen($match) + 1);
         }
 
+        if(isset($tokens['rspauth'])) {
+            return $tokens;
+        }
+
         // Required: nonce, algorithm
-        if (empty($tokens['nonce']) || empty($tokens['algorithm'])) {
+        if ((empty($tokens['nonce']) || empty($tokens['algorithm'])) && !empty($tokens['rspauth'])) {
             return array();
         }
 
