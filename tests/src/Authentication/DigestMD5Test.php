@@ -175,9 +175,10 @@ class DigestMD5Test extends TestCase
     }
 
     /**
-     * @expectedException \Fabiang\Sasl\Exception\InvalidArgumentException
      * @covers ::createResponse
      * @covers ::parseChallenge
+     * @covers ::checkToken
+     * @covers ::trim
      * @uses Fabiang\Sasl\Options
      * @uses Fabiang\Sasl\Authentication\AbstractAuthentication::__construct
      */

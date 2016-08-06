@@ -141,7 +141,7 @@ class DigestMD5 extends AbstractAuthentication implements ChallengeAuthenticatio
         }
 
         // Required: nonce, algorithm
-        if ((empty($tokens['nonce']) || empty($tokens['algorithm'])) && !empty($tokens['rspauth'])) {
+        if ((empty($tokens['nonce']) || empty($tokens['algorithm'])) && empty($tokens['rspauth'])) {
             return array();
         }
 
