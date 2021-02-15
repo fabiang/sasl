@@ -37,7 +37,7 @@
 
 namespace Fabiang\Sasl\Behat;
 
-use PHPUnit_Framework_Assert as Assert;
+use PHPUnit\Framework\Assert;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 
 /**

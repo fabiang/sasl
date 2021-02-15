@@ -1,5 +1,5 @@
 /vendor/
 .vagrant/
-/tests/behat.yml
-/tests/phpunit.xml
-/nbproject/private/
+behat.yml
+phpunit.xml
+.phpunit.result.cache

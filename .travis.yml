@@ -37,11 +37,11 @@ install:
     - sudo ./tests/provisioner/install_dovecot.sh testuser testpass
 
 before_script:
-    - cat tests/behat.yml.dist | sed "s/precise32/$HOSTNAME/" > tests/behat.yml
+    - cat behat.yml.dist | sed "s/precise32/$HOSTNAME/" > behat.yml
 
 script:
     - ./vendor/bin/phpunit --coverage-clover=build/logs/clover.xml
-    - ./vendor/bin/behat -c tests/behat.yml -f progress
+    - ./vendor/bin/behat -c behat.yml -f progress
 
 after_script:
     - ./tests/upload_artefacts.sh

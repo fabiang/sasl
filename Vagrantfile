@@ -30,7 +30,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.post_up_message = <<MESSAGE
 You can now run the integration tests with:
 
-./vendor/bin/behat -c tests/behat.yml.dist
+./vendor/bin/behat -c behat.yml.dist
 MESSAGE
 
   # Create a private network, which allows host-only access to the machine

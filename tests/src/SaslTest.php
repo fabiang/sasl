@@ -37,7 +37,7 @@
 
 namespace Fabiang\Sasl;
 
-use PHPUnit_Framework_TestCase as TestCase;
+use PHPUnit\Framework\TestCase;
 use Fabiang\Sasl\Options;
 
 /**
@@ -57,7 +57,7 @@ class SaslTest extends TestCase
      * Sets up the fixture, for example, opens a network connection.
      * This method is called before a test is executed.
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->object = new Sasl;
     }
@@ -129,7 +129,7 @@ class SaslTest extends TestCase
     public function testFactoryWithOptionsObject()
     {
         $options = new Options('test');
-        $object = $this->object->factory('login', $options);
+        $object  = $this->object->factory('login', $options);
         $this->assertSame($options, $object->getOptions());
     }
 
@@ -216,4 +216,5 @@ class SaslTest extends TestCase
             ),
         );
     }
+
 }

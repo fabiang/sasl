@@ -1,7 +1,7 @@
 default:
     suites:
         authentication_features:
-            paths: [ %paths.base%/features/ ]
+            paths: [ "%paths.base%/tests/features/" ]
             contexts:
                 - Fabiang\Sasl\Behat\XmppContext:
                     - localhost
@@ -9,12 +9,12 @@ default:
                     - precise32
                     - testuser
                     - testpass
-                    - %paths.base%/log/features/
+                    - "%paths.base%/log/features/"
                 - Fabiang\Sasl\Behat\Pop3Context:
                     - localhost
                     - 11110
                     - testuser
                     - testpass
-                    - %paths.base%/log/features/
+                    - "%paths.base%/log/features/"
     testers:
         strict: true

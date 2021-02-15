@@ -37,7 +37,7 @@
 
 namespace Fabiang\Sasl\Authentication;
 
-use PHPUnit_Framework_TestCase as TestCase;
+use PHPUnit\Framework\TestCase;
 use Fabiang\Sasl\Options;
 
 /**
@@ -62,7 +62,7 @@ class CramMD5Test extends TestCase
      * Sets up the fixture, for example, opens a network connection.
      * This method is called before a test is executed.
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->options = new Options('user', 'pass');
         $this->object  = new CramMD5($this->options);

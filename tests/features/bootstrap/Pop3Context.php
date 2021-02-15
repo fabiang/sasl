@@ -39,7 +39,7 @@ namespace Fabiang\Sasl\Behat;
 
 use Behat\Behat\Context\Context;
 use Behat\Behat\Context\SnippetAcceptingContext;
-use PHPUnit_Framework_Assert as Assert;
+use PHPUnit\Framework\Assert;
 use Fabiang\Sasl\Sasl;
 use Fabiang\Sasl\Options;
 
