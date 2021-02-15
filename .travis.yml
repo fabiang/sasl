@@ -43,6 +43,8 @@ after_script:
 
 after_failure:
     - cat tests/log/features/behat.*.log
+    - tail -n 100 /var/log/dovecot.log
+    - tail -n 100 /var/log/ejabberd/ejabberd.log
 
 matrix:
     fast_finish: true

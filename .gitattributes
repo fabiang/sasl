@@ -4,5 +4,6 @@
 .travis.yml export-ignore
 /tests export-ignore
 /Vagrantfile export-ignore
-phpunit.xml.dist
-behat.yml.dist
+phpunit.xml.dist export-ignore
+behat.yml.dist export-ignore
+composer.lock export-ignore
