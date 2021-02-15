@@ -137,7 +137,7 @@ class Sasl
      */
     private function checkEmpty(array $array, $key)
     {
-        if (!empty($array[$key])) {
+        if (!empty($array[$key]) || $array[$key] === "0") {
             return $array[$key];
         }
 
