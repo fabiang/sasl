@@ -191,10 +191,17 @@ class XmppContext extends AbstractContext implements Context, SnippetAcceptingCo
     {
         $data = $this->readStreamUntil('</challenge>');
 
+        $authenticationObject = $this->authenticationFactory->factory('DIGEST-MD5', new Options(
+            $this->username,
+            $this->password,
+            null,
+            'xmpp',
+            $this->domain
+        ));
+        
         $challenge = base64_decode(substr($data, 52, -12));
 
-        Assert::assertRegExp('/^rspauth=.+$/', $challenge);
-
+        Assert::assertSame("", $authenticationObject->createResponse($challenge));
         $this->write("<response xmlns='urn:ietf:params:xml:ns:xmpp-sasl'/>");
     }
 
