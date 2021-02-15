@@ -100,6 +100,32 @@ class SaslTest extends TestCase
     }
 
     /**
+     * @param string $expectedInstance Expected object instance
+     * @param string $mechanism        Authentication mechanism
+     * @param string $hashAlgo         Expected hash alogrithm (for SCRAM)
+     * @covers ::factory
+     * @covers ::checkEmpty
+     * @dataProvider provideMechanisms
+     */
+    public function testFactoryZeroStringValues($expectedInstance, $mechanism, $hashAlgo = null)
+    {
+        $object = $this->object->factory($mechanism, array(
+            'authcid'  => '0',
+            'hostname' => '0',
+            'service'  => '0',
+            'secret'   => '0',
+            'authzid'  => '0'
+        ));
+        $this->assertInstanceOf($expectedInstance, $object);
+        $this->assertInstanceOf('Fabiang\Sasl\Options', $object->getOptions());
+        $this->assertSame('0', $object->getOptions()->getAuthcid());
+        $this->assertSame('0', $object->getOptions()->getSecret());
+        $this->assertSame('0', $object->getOptions()->getAuthzid());
+        $this->assertSame('0', $object->getOptions()->getService());
+        $this->assertSame('0', $object->getOptions()->getHostname());
+    }
+
+    /**
      * @covers ::factory
      * @covers ::createOptionsObject
      * @covers ::checkEmpty
