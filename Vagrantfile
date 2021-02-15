@@ -12,7 +12,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # please see the online documentation at vagrantup.com.
 
   # Every Vagrant virtual environment requires a box to build off of.
-  config.vm.box = "hashicorp/precise32"
+  config.vm.box = "ubuntu/xenial64"
 
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
@@ -30,7 +30,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.post_up_message = <<MESSAGE
 You can now run the integration tests with:
 
-./vendor/bin/behat -c tests/behat.yml.dist
+./vendor/bin/behat -c behat.yml.dist
 MESSAGE
 
   # Create a private network, which allows host-only access to the machine

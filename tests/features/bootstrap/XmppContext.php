@@ -4,7 +4,7 @@
  * Sasl library.
  *
  * Copyright (c) 2002-2003 Richard Heyes,
- *               2014 Fabian Grutschus
+ *               2014-2021 Fabian Grutschus
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -39,7 +39,7 @@ namespace Fabiang\Sasl\Behat;
 
 use Behat\Behat\Context\Context;
 use Behat\Behat\Context\SnippetAcceptingContext;
-use PHPUnit_Framework_Assert as Assert;
+use PHPUnit\Framework\Assert;
 use Fabiang\Sasl\Sasl;
 use Fabiang\Sasl\Options;
 

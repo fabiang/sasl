@@ -4,7 +4,7 @@
 # Sasl library.
 #
 # Copyright (c) 2002-2003 Richard Heyes,
-#               2014 Fabian Grutschus
+#               2014-2021 Fabian Grutschus
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -66,6 +66,11 @@ if [ ! -f "$dovecot_configured" ]; then
         cp "$dovecot_mail_config" "$dovecot_mail_config.orig"
     fi
 
+    dovecot_logging_config="/etc/dovecot/conf.d/10-logging.conf"
+    if [ ! -f "$dovecot_logging_config.orig" ]; then
+        cp "$dovecot_logging_config" "$dovecot_logging_config.orig"
+    fi
+
     dovecot_passwdfile_config="/etc/dovecot/conf.d/auth-passwdfile.conf.ext"
     if [ ! -f "$dovecot_passwdfile_config.orig" ]; then
         cp "$dovecot_passwdfile_config" "$dovecot_passwdfile_config.orig"
@@ -95,6 +100,12 @@ if [ ! -f "$dovecot_configured" ]; then
         dovecot_restart=1
     fi
 
+    config_logging=$(grep '#log_path = syslog' "$dovecot_logging_config")
+    if [ -n "$config_logging" ]; then
+        sed -i 's/#log_path = syslog/log_path = \/var\/log\/dovecot.log/' "$dovecot_logging_config"
+        dovecot_restart=1
+    fi
+
     config_passwd=$(grep 'scheme=CRYPT' "$dovecot_passwdfile_config")
     if [ -n "$config_passwd" ]; then
         sed -i 's/scheme=CRYPT/scheme=cram-md5/' "$dovecot_passwdfile_config"
@@ -114,9 +125,11 @@ fi
 id "$dovecot_username" > /dev/null 2>&1
 if [ $? -eq 1 ]; then
     echo -n "Adding user '$dovecot_username' with password '$dovecot_password'... "
-    useradd --password "$dovecot_password" "$dovecot_username" > /dev/null
+    useradd --password "$dovecot_password" --user-group --groups mail "$dovecot_username" > /dev/null
     mkdir -p /home/testuser/Maildir
+    mkdir -p /home/testuser/mail
     chown testuser:testuser /home/testuser/Maildir
+    chown testuser:testuser /home/testuser/mail
     echo "done"
 fi
 

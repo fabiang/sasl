@@ -1,42 +1,54 @@
 language: php
 
+sudo: true
+
+git:
+  depth: 2
+
 php:
-    - 5.3.3
-    - 5.3
-    - 5.4
-    - 5.5
-    - 5.6
     - 7.1
     - 7.2
     - 7.3
-    - master
+    - 7.4
+    - 8.0
 
-addons:
-  code_climate:
-    repo_token: 5619fc9386e65aaf3b57e6978ea07726cbd3bd0ed9198e0811b1248ef371e959
+cache:
+  directories:
+    - $HOME/.composer/cache
+
+env:
+  global:
+    - XDEBUG_MODE=coverage
+  matrix:
+    - PREFER_LOWEST=""
+    - PREFER_LOWEST="--prefer-lowest"
 
 before_install:
     - echo $HOSTNAME
-    - export IS_HHVM=$(phpenv version | grep "hhvm" > /dev/null; echo $?)
-    - echo $IS_HHVM
 
 install:
-    - composer install --dev --no-interaction
+    - composer update --no-interaction --prefer-stable --prefer-dist --no-suggest --no-scripts --no-plugins $PREFER_LOWEST
     - sudo ./tests/provisioner/install_ejabberd.sh testuser testpass
     - sudo ./tests/provisioner/install_dovecot.sh testuser testpass
 
 before_script:
-    - cat tests/behat.yml.dist | sed "s/precise32/$HOSTNAME/" > tests/behat.yml
+    - cat behat.yml.dist | sed "s/ubuntu-xenial/$HOSTNAME/" > behat.yml
 
 script:
-    - ./vendor/bin/phpunit -c tests --coverage-clover=build/logs/clover.xml
-    - ./vendor/bin/behat -c tests/behat.yml -f progress
+    - ./vendor/bin/phpunit --coverage-clover=build/logs/clover.xml
+    - ./vendor/bin/behat -c behat.yml -f progress
 
 after_script:
     - ./tests/upload_artefacts.sh
 
 after_failure:
     - cat tests/log/features/behat.*.log
+    - sudo tail -n 100 /var/log/dovecot.log
+    - sudo tail -n 100 /var/log/ejabberd/ejabberd.log
 
 matrix:
     fast_finish: true
+
+addons:
+  code_climate:
+    repo_token: 5619fc9386e65aaf3b57e6978ea07726cbd3bd0ed9198e0811b1248ef371e959
