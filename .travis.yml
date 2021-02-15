@@ -1,10 +1,15 @@
 language: php
 
+sudo: true
+
+git:
+  depth: 2
+
 php:
-    - 5.3.3
-    - 5.3
-    - 5.4
-    - 5.5
+    #- 5.3.3
+    #- 5.3
+    #- 5.4
+    #- 5.5
     - 5.6
     - 7.1
     - 7.2
@@ -12,15 +17,22 @@ php:
     - 7.4
     - 8.0
 
-addons:
-  code_climate:
-    repo_token: 5619fc9386e65aaf3b57e6978ea07726cbd3bd0ed9198e0811b1248ef371e959
+cache:
+  directories:
+    - $HOME/.composer/cache
+
+env:
+  global:
+    - XDEBUG_MODE=coverage
+  matrix:
+    - PREFER_LOWEST=""
+    - PREFER_LOWEST="--prefer-lowest"
 
 before_install:
     - echo $HOSTNAME
 
 install:
-    - composer install --dev --no-interaction
+    - composer update --no-interaction --prefer-stable --prefer-dist --no-suggest --no-scripts --no-plugins $PREFER_LOWEST
     - sudo ./tests/provisioner/install_ejabberd.sh testuser testpass
     - sudo ./tests/provisioner/install_dovecot.sh testuser testpass
 
@@ -39,3 +51,7 @@ after_failure:
 
 matrix:
     fast_finish: true
+
+addons:
+  code_climate:
+    repo_token: 5619fc9386e65aaf3b57e6978ea07726cbd3bd0ed9198e0811b1248ef371e959
