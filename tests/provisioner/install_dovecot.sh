@@ -127,7 +127,9 @@ if [ $? -eq 1 ]; then
     echo -n "Adding user '$dovecot_username' with password '$dovecot_password'... "
     useradd --password "$dovecot_password" "$dovecot_username" > /dev/null
     mkdir -p /home/testuser/Maildir
+    mkdir -p /home/testuser/mail
     chown testuser:testuser /home/testuser/Maildir
+    chown testuser:testuser /home/testuser/mail
     echo "done"
 fi
 

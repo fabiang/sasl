@@ -42,10 +42,5 @@
         "behat/behat": "^3.0",
         "codeclimate/php-test-reporter": "@dev",
         "phpunit/php-invoker": "^1.1"
-    },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "1.1.x-dev"
-        }
     }
 }
