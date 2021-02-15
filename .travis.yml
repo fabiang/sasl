@@ -32,7 +32,7 @@ install:
     - sudo ./tests/provisioner/install_dovecot.sh testuser testpass
 
 before_script:
-    - cat behat.yml.dist | sed "s/precise32/$HOSTNAME/" > behat.yml
+    - cat behat.yml.dist | sed "s/ubuntu-xenial/$HOSTNAME/" > behat.yml
 
 script:
     - ./vendor/bin/phpunit --coverage-clover=build/logs/clover.xml
