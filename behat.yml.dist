@@ -6,7 +6,7 @@ default:
                 - Fabiang\Sasl\Behat\XmppContext:
                     - localhost
                     - 15222
-                    - precise32
+                    - ubuntu-xenial
                     - testuser
                     - testpass
                     - "%paths.base%/tests/log/features/"
