@@ -39,7 +39,7 @@
     "require-dev": {
         "phpunit/phpunit": "^5.7 || ^6.5 || ^7.5 || ^8.5 || ^9.5",
         "satooshi/php-coveralls": "^0.6.1",
-        "behat/behat": "^3.0",
+        "behat/behat": "^3.6",
         "codeclimate/php-test-reporter": "@dev",
         "phpunit/php-invoker": "^1.1"
     }
