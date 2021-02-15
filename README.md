@@ -2,8 +2,8 @@
 
 The PHP SASL Authentification Library.
 
-[![Latest Stable Version](https://poser.pugx.org/fabiang/sasl/v/stable.svg)](https://packagist.org/packages/fabiang/sasl) [![Total Downloads](https://poser.pugx.org/fabiang/sasl/downloads.svg)](https://packagist.org/packages/fabiang/sasl) [![Latest Unstable Version](https://poser.pugx.org/fabiang/sasl/v/unstable.svg)](https://packagist.org/packages/fabiang/sasl) [![License](https://poser.pugx.org/fabiang/sasl/license.svg)](https://packagist.org/packages/fabiang/sasl) [![HHVM Status](http://hhvm.h4cc.de/badge/fabiang/sasl.svg)](http://hhvm.h4cc.de/package/fabiang/sasl)  
-[![Build Status](https://travis-ci.org/fabiang/sasl.svg?branch=master)](https://travis-ci.org/fabiang/sasl) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/fabiang/sasl/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/fabiang/sasl/?branch=master) [![Code Climate](https://codeclimate.com/github/fabiang/sasl/badges/gpa.svg)](https://codeclimate.com/github/fabiang/sasl) [![SensioLabsInsight](https://insight.sensiolabs.com/projects/e81e1e30-c545-420a-8a0c-59b60976f54b/mini.png)](https://insight.sensiolabs.com/projects/e81e1e30-c545-420a-8a0c-59b60976f54b) [![Coverage Status](https://img.shields.io/coveralls/fabiang/sasl.svg)](https://coveralls.io/r/fabiang/sasl) [![Dependency Status](https://gemnasium.com/fabiang/sasl.svg)](https://gemnasium.com/fabiang/sasl)
+[![Latest Stable Version](https://poser.pugx.org/fabiang/sasl/v/stable.svg)](https://packagist.org/packages/fabiang/sasl) [![Total Downloads](https://poser.pugx.org/fabiang/sasl/downloads.svg)](https://packagist.org/packages/fabiang/sasl) [![Latest Unstable Version](https://poser.pugx.org/fabiang/sasl/v/unstable.svg)](https://packagist.org/packages/fabiang/sasl) [![License](https://poser.pugx.org/fabiang/sasl/license.svg)](https://packagist.org/packages/fabiang/sasl)
+[![Build Status](https://travis-ci.com/fabiang/sasl.svg?branch=master)](https://travis-ci.com/fabiang/sasl) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/fabiang/sasl/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/fabiang/sasl/?branch=master) [![Code Climate](https://codeclimate.com/github/fabiang/sasl/badges/gpa.svg)](https://codeclimate.com/github/fabiang/sasl) [![SensioLabsInsight](https://insight.sensiolabs.com/projects/e81e1e30-c545-420a-8a0c-59b60976f54b/mini.png)](https://insight.sensiolabs.com/projects/e81e1e30-c545-420a-8a0c-59b60976f54b) [![Coverage Status](https://img.shields.io/coveralls/fabiang/sasl.svg)](https://coveralls.io/r/fabiang/sasl)
 
 Provides code to generate responses to common SASL mechanisms, including:
 * Digest-MD5
@@ -104,7 +104,7 @@ Just [install Vagrant](https://www.vagrantup.com/downloads.html) and run:
 vagrant up
 ```
 
-After some minutes you'll have the runnig server instances inside of a virtual machine.  
+After some minutes you'll have the runnig server instances inside of a virtual machine.
 Now you can run the integration tests:
 
 ```

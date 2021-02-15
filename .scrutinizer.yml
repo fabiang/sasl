@@ -15,7 +15,7 @@ tools:
     php_sim: true
     php_cpd: false
     php_loc: true
-    php_hhvm: true
+    php_hhvm: false
     php_mess_detector: true
     php_pdepend: true
     php_analyzer: false

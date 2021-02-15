@@ -9,7 +9,8 @@ php:
     - 7.1
     - 7.2
     - 7.3
-    - master
+    - 7.4
+    - 8.0
 
 addons:
   code_climate:
@@ -17,8 +18,6 @@ addons:
 
 before_install:
     - echo $HOSTNAME
-    - export IS_HHVM=$(phpenv version | grep "hhvm" > /dev/null; echo $?)
-    - echo $IS_HHVM
 
 install:
     - composer install --dev --no-interaction
@@ -29,7 +28,7 @@ before_script:
     - cat tests/behat.yml.dist | sed "s/precise32/$HOSTNAME/" > tests/behat.yml
 
 script:
-    - ./vendor/bin/phpunit -c tests --coverage-clover=build/logs/clover.xml
+    - ./vendor/bin/phpunit --coverage-clover=build/logs/clover.xml
     - ./vendor/bin/behat -c tests/behat.yml -f progress
 
 after_script:

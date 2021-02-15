@@ -4,3 +4,4 @@
 .travis.yml export-ignore
 /tests export-ignore
 /Vagrantfile export-ignore
+phpunit.xml.dist
