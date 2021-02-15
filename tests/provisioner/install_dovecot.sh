@@ -125,7 +125,7 @@ fi
 id "$dovecot_username" > /dev/null 2>&1
 if [ $? -eq 1 ]; then
     echo -n "Adding user '$dovecot_username' with password '$dovecot_password'... "
-    useradd --password "$dovecot_password" "$dovecot_username" > /dev/null
+    useradd --password "$dovecot_password" --user-group --groups mail "$dovecot_username" > /dev/null
     mkdir -p /home/testuser/Maildir
     mkdir -p /home/testuser/mail
     chown testuser:testuser /home/testuser/Maildir
