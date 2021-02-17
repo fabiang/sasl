@@ -1,6 +1,10 @@
 /vendor/
 .vagrant/
+build/
 behat.yml
 phpunit.xml
 .phpunit.result.cache
 *.log
+codeclimate.json
+ocular.phar
+ocular.phar*

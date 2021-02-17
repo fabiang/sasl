@@ -39,7 +39,7 @@
 
 <phpunit
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/5.7/phpunit.xsd"
+    xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/8.5/phpunit.xsd"
     colors="true"
     convertErrorsToExceptions="true"
     convertNoticesToExceptions="true"
@@ -60,7 +60,7 @@
 
         <filter>
             <whitelist>
-                <directory>/src/</directory>
+                <directory>src/</directory>
             </whitelist>
         </filter>
 
