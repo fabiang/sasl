@@ -19,15 +19,9 @@ cache:
 env:
   global:
     - XDEBUG_MODE=coverage
-    - UPLOAD_ARTIFACTS=0
   matrix:
     - PREFER_LOWEST=""
     - PREFER_LOWEST="--prefer-lowest"
-
-matrix:
-    include:
-    - php: 7.4
-      env: UPLOAD_ARTIFACTS=1
 
 before_install:
     - echo $HOSTNAME
