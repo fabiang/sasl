@@ -8,3 +8,7 @@ phpunit.xml
 codeclimate.json
 ocular.phar
 ocular.phar*
+php-coveralls.phar
+php-coveralls.phar*
+codeclimate-test-reporter.phar
+codeclimate-test-reporter.phar*
