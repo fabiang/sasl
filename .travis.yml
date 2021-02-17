@@ -27,7 +27,7 @@ before_install:
     - echo $HOSTNAME
 
 install:
-    - composer update --no-interaction --prefer-stable --prefer-dist --no-suggest --no-scripts --no-plugins $PREFER_LOWEST --ignore-platform-reqs
+    - composer update --no-interaction --prefer-stable --prefer-dist --no-suggest --no-scripts --no-plugins $PREFER_LOWEST
     - sudo ./tests/provisioner/install_ejabberd.sh testuser testpass
     - sudo ./tests/provisioner/install_dovecot.sh testuser testpass
 
