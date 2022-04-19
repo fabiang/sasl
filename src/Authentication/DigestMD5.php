@@ -47,7 +47,6 @@ use Fabiang\Sasl\Exception\RuntimeException;
  */
 class DigestMD5 extends AbstractAuthentication implements ChallengeAuthenticationInterface
 {
-
     /**
      * Provides the (main) client response for DIGEST-MD5
      * requires a few extra parameters than the other
@@ -157,7 +156,6 @@ class DigestMD5 extends AbstractAuthentication implements ChallengeAuthenticatio
             if (!empty($tokens[$key])) {
                 // Allowed multiple "realm" and "auth-param"
                 if ('realm' === $key || 'auth-param' === $key) {
-
                     // we don't support multiple realms yet
                     if ('realm' === $key) {
                         throw new RuntimeException('Multiple realms are not supported');
@@ -204,7 +202,13 @@ class DigestMD5 extends AbstractAuthentication implements ChallengeAuthenticatio
         if ($authzid == '') {
             $A1 = sprintf('%s:%s:%s', pack('H32', md5(sprintf('%s:%s:%s', $authcid, $realm, $pass))), $nonce, $cnonce);
         } else {
-            $A1 = sprintf('%s:%s:%s:%s', pack('H32', md5(sprintf('%s:%s:%s', $authcid, $realm, $pass))), $nonce, $cnonce, $authzid);
+            $A1 = sprintf(
+                '%s:%s:%s:%s',
+                pack('H32', md5(sprintf('%s:%s:%s', $authcid, $realm, $pass))),
+                $nonce,
+                $cnonce,
+                $authzid
+            );
         }
         $A2 = 'AUTHENTICATE:' . $digest_uri;
         return md5(sprintf('%s:%s:00000001:%s:auth:%s', md5($A1), $nonce, $cnonce, md5($A2)));

@@ -44,12 +44,11 @@ namespace Fabiang\Sasl\Authentication;
  */
 class External extends AbstractAuthentication implements AuthenticationInterface
 {
-
     /**
      * Returns EXTERNAL response
      *
      * @param string $challenge
-     * @return stringEXTERNAL Response
+     * @return string EXTERNAL Response
      */
     public function createResponse($challenge = null)
     {

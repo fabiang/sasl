@@ -47,7 +47,6 @@ use Fabiang\Sasl\Options;
  */
 class ExternalTest extends TestCase
 {
-
     /**
      * @var External
      */

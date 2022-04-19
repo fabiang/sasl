@@ -46,7 +46,6 @@ use Fabiang\Sasl\Options;
  */
 abstract class AbstractAuthentication
 {
-
     /**
      * Use random devices.
      *

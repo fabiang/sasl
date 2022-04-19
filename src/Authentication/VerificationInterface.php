@@ -43,7 +43,6 @@ namespace Fabiang\Sasl\Authentication;
  */
 interface VerificationInterface
 {
-
     /**
      * Varify connection.
      *

@@ -46,7 +46,6 @@ use PHPUnit\Framework\TestCase;
  */
 class OptionsTest extends TestCase
 {
-
     /**
      * @var Options
      */

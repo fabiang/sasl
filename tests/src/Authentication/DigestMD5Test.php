@@ -47,7 +47,6 @@ use Fabiang\Sasl\Options;
  */
 class DigestMD5Test extends TestCase
 {
-
     /**
      * @var DigestMD5
      */
@@ -81,13 +80,14 @@ class DigestMD5Test extends TestCase
     public function testGetResponseRealm()
     {
          $this->assertRegExp(
-            '#^username="authcid",realm="localhost",authzid="authzid",nonce="abcdefghijklmnopqrstuvw",cnonce="[^"]+",nc=00000001,'
-            . 'qop=auth,digest-uri="service/hostname",response=[^,]+,maxbuf=65536$#',
-            $this->object->createResponse(
-                'realm="localhost",nonce="abcdefghijklmnopqrstuvw",qop="auth",charset=utf-8,algorithm=md5-sess,'
-                . 'auth-param=1,auth-param=2'
-            )
-        );
+             '#^username="authcid",realm="localhost",authzid="authzid",'
+             . 'nonce="abcdefghijklmnopqrstuvw",cnonce="[^"]+",nc=00000001,'
+             . 'qop=auth,digest-uri="service/hostname",response=[^,]+,maxbuf=65536$#',
+             $this->object->createResponse(
+                 'realm="localhost",nonce="abcdefghijklmnopqrstuvw",qop="auth",charset=utf-8,algorithm=md5-sess,'
+                 . 'auth-param=1,auth-param=2'
+             )
+         );
     }
 
     /**
@@ -97,10 +97,10 @@ class DigestMD5Test extends TestCase
      * @uses Fabiang\Sasl\Authentication\DigestMD5::trim
      * @uses Fabiang\Sasl\Options
      * @uses Fabiang\Sasl\Authentication\AbstractAuthentication::__construct
-     * @expectedException Fabiang\Sasl\Exception\RuntimeException
      */
     public function testGetResponseWithMultipleRealms()
     {
+        $this->expectEx('Fabiang\Sasl\Exception\RuntimeException');
         $this->object->createResponse('realm="localhost",realm="phpunit"');
     }
 
@@ -119,12 +119,13 @@ class DigestMD5Test extends TestCase
         DigestMD5::$useDevRandom = false;
 
          $this->assertRegExp(
-            '#^username="authcid",realm="localhost",authzid="authzid",nonce="abcdefghijklmnopqrstuvw",cnonce="[^"]+",nc=00000001,'
-            . 'qop=auth,digest-uri="service/hostname",response=[^,]+,maxbuf=65536$#',
-            $this->object->createResponse(
-                'realm="localhost",nonce="abcdefghijklmnopqrstuvw",qop="auth",charset=utf-8,algorithm=md5-sess'
-            )
-        );
+             '#^username="authcid",realm="localhost",authzid="authzid",'
+             . 'nonce="abcdefghijklmnopqrstuvw",cnonce="[^"]+",nc=00000001,'
+             . 'qop=auth,digest-uri="service/hostname",response=[^,]+,maxbuf=65536$#',
+             $this->object->createResponse(
+                 'realm="localhost",nonce="abcdefghijklmnopqrstuvw",qop="auth",charset=utf-8,algorithm=md5-sess'
+             )
+         );
 
         DigestMD5::$useDevRandom = true;
     }
@@ -142,12 +143,12 @@ class DigestMD5Test extends TestCase
     public function testGetResponseNoRealm()
     {
          $this->assertRegExp(
-            '#^username="authcid",authzid="authzid",nonce="abcdefghijklmnopqrstuvw",cnonce="[^"]+",nc=00000001,'
-            . 'qop=auth,digest-uri="service/hostname",response=[^,]+,maxbuf=65536$#',
-            $this->object->createResponse(
-                'nonce="abcdefghijklmnopqrstuvw",qop="auth",charset=utf-8,algorithm=md5-sess,opaque=1,domain=2'
-            )
-        );
+             '#^username="authcid",authzid="authzid",nonce="abcdefghijklmnopqrstuvw",cnonce="[^"]+",nc=00000001,'
+             . 'qop=auth,digest-uri="service/hostname",response=[^,]+,maxbuf=65536$#',
+             $this->object->createResponse(
+                 'nonce="abcdefghijklmnopqrstuvw",qop="auth",charset=utf-8,algorithm=md5-sess,opaque=1,domain=2'
+             )
+         );
     }
 
     /**
@@ -166,16 +167,15 @@ class DigestMD5Test extends TestCase
         $object  = new DigestMD5($options);
 
          $this->assertRegExp(
-            '#^username="authcid",nonce="abcdefghijklmnopqrstuvw",cnonce="[^"]+",nc=00000001,'
-            . 'qop=auth,digest-uri="service/hostname",response=[^,]+,maxbuf=65536$#',
-            $object->createResponse(
-                'nonce="abcdefghijklmnopqrstuvw",qop="auth",charset=utf-8,algorithm=md5-sess,opaque=1,domain=2'
-            )
-        );
+             '#^username="authcid",nonce="abcdefghijklmnopqrstuvw",cnonce="[^"]+",nc=00000001,'
+             . 'qop=auth,digest-uri="service/hostname",response=[^,]+,maxbuf=65536$#',
+             $object->createResponse(
+                 'nonce="abcdefghijklmnopqrstuvw",qop="auth",charset=utf-8,algorithm=md5-sess,opaque=1,domain=2'
+             )
+         );
     }
 
     /**
-     * @expectedException \Fabiang\Sasl\Exception\InvalidArgumentException
      * @covers ::createResponse
      * @covers ::parseChallenge
      * @uses Fabiang\Sasl\Options
@@ -183,11 +183,11 @@ class DigestMD5Test extends TestCase
      */
     public function testGetResponseInvalidChallenge()
     {
+        $this->expectEx('Fabiang\Sasl\Exception\InvalidArgumentException');
         $this->object->createResponse('invalid_challenge');
     }
 
     /**
-     * @expectedException \Fabiang\Sasl\Exception\InvalidArgumentException
      * @covers ::createResponse
      * @covers ::parseChallenge
      * @covers ::checkToken
@@ -197,6 +197,16 @@ class DigestMD5Test extends TestCase
      */
     public function testParseChallengeNotAllowiedMultiples()
     {
+        $this->expectEx('Fabiang\Sasl\Exception\InvalidArgumentException');
         $this->object->createResponse('qop=1,qop=2');
+    }
+
+    private function expectEx($exception)
+    {
+        if (method_exists($this, 'expectException')) {
+            $this->expectException($exception);
+        } else {
+            $this->setExpectedException($exception);
+        }
     }
 }

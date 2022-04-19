@@ -47,7 +47,6 @@ use Fabiang\Sasl\Options;
  */
 class PlainTest extends TestCase
 {
-
     /**
      * @var Plain
      */

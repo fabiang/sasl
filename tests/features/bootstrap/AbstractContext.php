@@ -57,7 +57,9 @@ abstract class AbstractContext
         $errno  = null;
         $errstr = null;
 
-        $this->stream = stream_socket_client("tcp://{$this->hostname}:{$this->port}", $errno, $errstr, 5);
+        $connectionString = "tcp://{$this->hostname}:{$this->port}";
+
+        $this->stream = stream_socket_client($connectionString, $errno, $errstr, 5);
 
         Assert::assertNotFalse($this->stream, "Coudn't connection to host {$this->hostname}");
     }
@@ -65,7 +67,7 @@ abstract class AbstractContext
     /**
      * Read stream until string is found.
      *
-     * @param string  $until
+     * @param string|array  $until
      * @param integer $timeout
      * @return string
      * @throws \Exception
@@ -73,14 +75,27 @@ abstract class AbstractContext
     protected function readStreamUntil($until, $timeout = 5)
     {
         $readStart = time();
-        $data      = '';
+
+        if (is_string($until)) {
+            $until = array($until);
+        }
+
+        $data = '';
         do {
             if (time() >= $readStart + $timeout) {
                 throw new \Exception('Timeout when trying to receive buffer');
             }
 
             $data .= $this->read();
-        } while (false === strpos($data, $until));
+
+            foreach ($until as $cuntil) {
+                $expected = strpos($data, $cuntil);
+
+                if (false !== $expected) {
+                    break 2;
+                }
+            }
+        } while (1);
 
         return $data;
     }
@@ -88,7 +103,9 @@ abstract class AbstractContext
     protected function read()
     {
         $data = fread($this->stream, 4096);
-        fwrite($this->logfile, 'S: ' . trim($data) . "\n");
+        if (strlen($data) > 0) {
+            fwrite($this->logfile, 'S: ' . trim($data) . "\n");
+        }
         return $data;
     }
 
@@ -127,8 +144,10 @@ abstract class AbstractContext
     {
         if ($this->stream) {
             fclose($this->stream);
+            $this->stream = null;
         }
 
         fclose($this->logfile);
+        $this->logfile = null;
     }
 }

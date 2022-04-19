@@ -126,10 +126,10 @@ id "$dovecot_username" > /dev/null 2>&1
 if [ $? -eq 1 ]; then
     echo -n "Adding user '$dovecot_username' with password '$dovecot_password'... "
     useradd --password "$dovecot_password" --user-group --groups mail "$dovecot_username" > /dev/null
-    mkdir -p /home/testuser/Maildir
-    mkdir -p /home/testuser/mail
-    chown testuser:testuser /home/testuser/Maildir
-    chown testuser:testuser /home/testuser/mail
+    mkdir -p "/home/$dovecot_username/Maildir"
+    mkdir -p "/home/$dovecot_username/mail"
+    chown "$dovecot_username:$dovecot_username" "/home/$dovecot_username/Maildir"
+    chown "$dovecot_username:$dovecot_username" "/home/$dovecot_username/mail"
     echo "done"
 fi
 

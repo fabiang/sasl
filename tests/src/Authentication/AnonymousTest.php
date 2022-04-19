@@ -47,7 +47,6 @@ use Fabiang\Sasl\Options;
  */
 class AnonymousTest extends TestCase
 {
-
     /**
      * @var Anonymous
      */

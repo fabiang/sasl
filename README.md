@@ -2,8 +2,13 @@
 
 The PHP SASL Authentification Library.
 
-[![Latest Stable Version](https://poser.pugx.org/fabiang/sasl/v/stable.svg)](https://packagist.org/packages/fabiang/sasl) [![Total Downloads](https://poser.pugx.org/fabiang/sasl/downloads.svg)](https://packagist.org/packages/fabiang/sasl) [![License](https://poser.pugx.org/fabiang/sasl/license.svg)](https://packagist.org/packages/fabiang/sasl)  
-[![Build Status](https://travis-ci.com/fabiang/sasl.svg?branch=master)](https://travis-ci.com/fabiang/sasl) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/fabiang/sasl/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/fabiang/sasl/?branch=master) [![SensioLabsInsight](https://insight.sensiolabs.com/projects/e81e1e30-c545-420a-8a0c-59b60976f54b/mini.png)](https://insight.sensiolabs.com/projects/e81e1e30-c545-420a-8a0c-59b60976f54b) [![Coverage Status](https://img.shields.io/coveralls/fabiang/sasl.svg)](https://coveralls.io/r/fabiang/sasl)
+[![Latest Stable Version](https://poser.pugx.org/fabiang/sasl/v/stable.svg)](https://packagist.org/packages/fabiang/sasl)
+[![Total Downloads](https://poser.pugx.org/fabiang/sasl/downloads.svg)](https://packagist.org/packages/fabiang/sasl)
+[![License](https://poser.pugx.org/fabiang/sasl/license.svg)](https://packagist.org/packages/fabiang/sasl)  
+[![Unit Tests](https://github.com/fabiang/sasl/actions/workflows/unit.yml/badge.svg?branch=develop)](https://github.com/fabiang/sasl/actions/workflows/unit.yml)
+[![Integration Tests](https://github.com/fabiang/sasl/actions/workflows/behat.yml/badge.svg?branch=develop)](https://github.com/fabiang/sasl/actions/workflows/behat.yml)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/fabiang/sasl/badges/quality-score.png?b=develop)](https://scrutinizer-ci.com/g/fabiang/sasl/?branch=develop)
+[![Code Coverage](https://scrutinizer-ci.com/g/fabiang/sasl/badges/coverage.png?b=develop)](https://scrutinizer-ci.com/g/fabiang/sasl/?branch=develop)
 
 Provides code to generate responses to common SASL mechanisms, including:
 * Digest-MD5
@@ -80,7 +85,7 @@ again and send the returned value to the server.
 | Plain     | yes     | yes    | optional | no      | no       | no        |
 | SCRAM-*   | yes     | yes    | optional | no      | no       | yes       |
 
-## Developing
+## Unit tests
 
 If you like this library and you want to contribute, make sure the unit tests
 and integration tests are running. Composer will help you to install the right
@@ -93,18 +98,37 @@ composer install --dev
 After that run the unit tests:
 
 ```
-./vendor/bin/phpunit -c tests
+./vendor/bin/phpunit
 ```
 
+## Integration tests
+
 The integration tests verify the authentication methods against an Ejabberd and Dovecot server.
+
+### Docker Compose
+
+To launch the servers you can use the provided Docker Compose file.
+Just [install Docker](https://www.docker.com/get-started/) and run:
+
+```
+docker-compose up -d
+```
+
+**Note:** ejabberd takes around *ten minutes* to start.
+
+### Vagrant
+
 To launch the servers you can use the provided Vagrant box.
-Just [install Vagrant](https://www.vagrantup.com/downloads.html) and run:
+Just [install Vagrant](https://www.vagrantup.com/downloads) and run:
 
 ```
 vagrant up
 ```
 
 After some minutes you'll have the runnig server instances inside of a virtual machine.
+
+### RUN
+
 Now you can run the integration tests:
 
 ```

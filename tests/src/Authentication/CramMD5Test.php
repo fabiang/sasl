@@ -47,7 +47,6 @@ use Fabiang\Sasl\Options;
  */
 class CramMD5Test extends TestCase
 {
-
     /**
      * @var CramMD5
      */

@@ -13,14 +13,24 @@ tools:
         config:
             standard: PSR2
     php_sim: true
-    php_cpd: false
+    php_cpd: true
     php_loc: true
     php_hhvm: false
     php_mess_detector: true
     php_pdepend: true
-    php_analyzer: false
+    php_analyzer: true
     sensiolabs_security_checker: true
     php_changetracking: true
     external_code_coverage:
-        runs: 1
-        timeout: 1200
+        runs: 2
+        timeout: 120
+
+build:
+  environment:
+    php: 7.3.0
+  nodes:
+    analysis:
+      tests:
+        override:
+          # Add the respective Scrutinizer analysis for your language like
+          - php-scrutinizer-run

@@ -47,7 +47,6 @@ use Fabiang\Sasl\Options;
  */
 class LoginTest extends TestCase
 {
-
     /**
      * @var Login
      */

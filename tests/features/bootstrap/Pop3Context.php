@@ -77,7 +77,7 @@ class Pop3Context extends AbstractContext implements Context, SnippetAcceptingCo
      *
      * @param string  $hostname Hostname for connection
      * @param integer $port
-     * @param string  $username Domain name of server (important for connecting)
+     * @param string  $username
      * @param string  $password
      * @param string  $logdir
      */

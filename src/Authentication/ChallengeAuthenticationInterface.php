@@ -44,5 +44,4 @@ namespace Fabiang\Sasl\Authentication;
  */
 interface ChallengeAuthenticationInterface extends AuthenticationInterface
 {
-
 }

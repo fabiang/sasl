@@ -47,7 +47,6 @@ use Fabiang\Sasl\Options;
  */
 class SCRAMTest extends TestCase
 {
-
     /**
      * @var SCRAM
      */
@@ -84,12 +83,12 @@ class SCRAMTest extends TestCase
      * @covers ::__construct
      * @uses Fabiang\Sasl\Options
      * @uses Fabiang\Sasl\Authentication\AbstractAuthentication::__construct
-     * @expectedException \Fabiang\Sasl\Exception\InvalidArgumentException
      * @expectedExceptionMessage Invalid SASL mechanism type 'test'
      */
     public function testConstructorWithInvalidHash()
     {
-        $object = new SCRAM(new Options('test'), 'test');
+        $this->expectEx('Fabiang\Sasl\Exception\InvalidArgumentException');
+        new SCRAM(new Options('test'), 'test');
     }
 
     /**
@@ -216,5 +215,14 @@ class SCRAMTest extends TestCase
     public function testVerifyNoResponseBefore()
     {
         $this->assertFalse($this->object->verify(''));
+    }
+
+    private function expectEx($exception)
+    {
+        if (method_exists($this, 'expectException')) {
+            $this->expectException($exception);
+        } else {
+            $this->setExpectedException($exception);
+        }
     }
 }

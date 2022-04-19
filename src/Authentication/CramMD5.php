@@ -46,7 +46,6 @@ use Fabiang\Sasl\Authentication\AbstractAuthentication;
  */
 class CramMD5 extends AbstractAuthentication implements ChallengeAuthenticationInterface
 {
-
     /**
      * Implements the CRAM-MD5 SASL mechanism
      * This DOES NOT base64 encode the return value,

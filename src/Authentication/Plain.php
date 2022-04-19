@@ -44,7 +44,6 @@ namespace Fabiang\Sasl\Authentication;
  */
 class Plain extends AbstractAuthentication implements AuthenticationInterface
 {
-
     /**
      * Returns PLAIN response
 

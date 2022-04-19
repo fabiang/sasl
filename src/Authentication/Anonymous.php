@@ -44,7 +44,6 @@ namespace Fabiang\Sasl\Authentication;
  */
 class Anonymous extends AbstractAuthentication implements AuthenticationInterface
 {
-
     /**
      * Not much to do here except return the token supplied.
      * No encoding, hashing or encryption takes place for this

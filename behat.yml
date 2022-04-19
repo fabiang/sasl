@@ -13,8 +13,8 @@ default:
                 - Fabiang\Sasl\Behat\Pop3Context:
                     - localhost
                     - 11110
-                    - testuser
-                    - testpass
+                    - vmail
+                    - pass
                     - "%paths.base%/tests/log/features/"
     testers:
         strict: true

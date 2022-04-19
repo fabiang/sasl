@@ -1,9 +1,9 @@
 /vendor/
 .vagrant/
 build/
-behat.yml
 phpunit.xml
 .phpunit.result.cache
+.phpcs-cache
 *.log
 codeclimate.json
 ocular.phar
@@ -12,3 +12,4 @@ php-coveralls.phar
 php-coveralls.phar*
 codeclimate-test-reporter.phar
 codeclimate-test-reporter.phar*
+composer.phar

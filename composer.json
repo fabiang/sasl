@@ -26,18 +26,41 @@
     "autoload": {
         "psr-4": {
             "Fabiang\\Sasl\\": "src/"
-        }
+        },
+        "files": ["src/throwable.php"]
     },
     "autoload-dev": {
         "psr-4": {
             "Fabiang\\Sasl\\Behat\\": "tests/features/bootstrap"
-        }
+        },
+        "files": ["tests/compat.php"]
     },
     "require": {
-        "php": "^5.3.3 || ^7.0 || ^8.0"
+        "php": "^5.3.3 || ^7.0 || ~8.0.0 || ~8.1.0"
     },
     "require-dev": {
         "behat/behat": "^3.6",
-        "phpunit/phpunit": "^5.7 || ^6.5 || ^7.5 || ^8.5"
+        "phpunit/phpunit": ">=4.8",
+        "slevomat/coding-standard": "*",
+        "squizlabs/php_codesniffer": "*",
+        "vimeo/psalm": "*"
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
+    },
+    "scripts": {
+        "phpcs": "phpcs",
+        "psalm": "psalm",
+        "phpunit": "phpunit",
+        "behat": "behat",
+        "test": [
+            "@phpunit",
+            "@behat",
+            "@psalm",
+            "@phpcs"
+        ]
     }
 }

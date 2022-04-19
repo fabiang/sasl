@@ -44,7 +44,6 @@ namespace Fabiang\Sasl;
  */
 class Options
 {
-
     /**
      * Authentication identity (e.g. username).
      *

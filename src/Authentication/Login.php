@@ -47,7 +47,6 @@ namespace Fabiang\Sasl\Authentication;
  */
 class Login extends AbstractAuthentication implements AuthenticationInterface
 {
-
     /**
      * Pseudo SASL LOGIN mechanism
      *

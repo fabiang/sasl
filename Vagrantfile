@@ -78,7 +78,7 @@ MESSAGE
   # Install dovecot for integration tests by bash script
   config.vm.provision "shell" do |s|
     s.path = "tests/provisioner/install_dovecot.sh"
-    s.args = ["testuser", "testpass"]
+    s.args = ["vmail", "pass"]
   end
 
   # Enable provisioning with CFEngine. CFEngine Community packages are

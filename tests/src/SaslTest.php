@@ -47,7 +47,6 @@ use Fabiang\Sasl\Options;
  */
 class SaslTest extends TestCase
 {
-
     /**
      * @var Sasl
      */
@@ -164,10 +163,10 @@ class SaslTest extends TestCase
      * @covers ::createOptionsObject
      * @covers ::checkEmpty
      * @uses Fabiang\Sasl\Options
-     * @expectedException Fabiang\Sasl\Exception\InvalidArgumentException
      */
     public function testFactoryWithWrongOptionsType()
     {
+        $this->expectEx('Fabiang\Sasl\Exception\InvalidArgumentException');
         $this->object->factory('login', 'test');
     }
 
@@ -176,11 +175,11 @@ class SaslTest extends TestCase
      * @uses Fabiang\Sasl\Sasl::createOptionsObject
      * @uses Fabiang\Sasl\Sasl::checkEmpty
      * @uses Fabiang\Sasl\Options
-     * @expectedException Fabiang\Sasl\Exception\InvalidArgumentException
      * @expectedExceptionMessage Invalid SASL mechanism type 'test'
      */
     public function testUnknownSaslMechanism()
     {
+        $this->expectEx('Fabiang\Sasl\Exception\InvalidArgumentException');
         $this->object->factory('test');
     }
 
@@ -243,4 +242,12 @@ class SaslTest extends TestCase
         );
     }
 
+    private function expectEx($exception)
+    {
+        if (method_exists($this, 'expectException')) {
+            $this->expectException($exception);
+        } else {
+            $this->setExpectedException($exception);
+        }
+    }
 }

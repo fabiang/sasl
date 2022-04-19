@@ -46,5 +46,4 @@ use Fabiang\Sasl\Exception\ExceptionInterface;
  */
 class RuntimeException extends \RuntimeException implements ExceptionInterface
 {
-
 }

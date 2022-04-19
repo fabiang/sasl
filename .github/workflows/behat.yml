@@ -1,0 +1,44 @@
+name: Integration Tests
+
+on:
+  push:
+    branches:
+    - '*'
+    pull_request:
+    - '*'
+
+jobs:
+  integrationtest:
+    runs-on: ubuntu-latest
+
+    name: Behat
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: 8.1
+
+    - name: Cache Composer packages
+      id: composer-cache
+      uses: actions/cache@v2
+      with:
+        path: vendor
+        key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-php-
+
+    - name: Install dependencies
+      run: composer install --prefer-dist --no-progress
+
+    - name: Build the stack
+      run: docker-compose up -d
+
+    - name: Sleep for 10 minutes
+      run: sleep 10m
+      shell: bash
+
+    - name: Run test suite
+      run: ./vendor/bin/behat

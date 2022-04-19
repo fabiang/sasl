@@ -37,12 +37,13 @@
 
 namespace Fabiang\Sasl\Exception;
 
+use Throwable;
+
 /**
  * Exception interface.
  *
  * @author Fabian Grutschus <f.grutschus@lubyte.de>
  */
-interface ExceptionInterface
+interface ExceptionInterface extends Throwable
 {
-
 }

@@ -1,0 +1,110 @@
+name: Unit Tests
+
+on:
+  push:
+    branches:
+    - '*'
+    pull_request:
+    - '*'
+
+jobs:
+  unittest:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        php:
+        - version: 5.3
+          phpunit: 4.8
+          compat: true
+          coverage: false
+        - version: 5.4
+          phpunit: 4.8
+          compat: true
+          coverage: false
+        - version: 5.5
+          phpunit: 4.8
+          compat: true
+          coverage: false
+        - version: 5.6
+          phpunit: 5.7
+          compat: true
+          coverage: false
+        - version: 7.0
+          phpunit: 6.5
+          compat: true
+          coverage: false
+        - version: 7.1
+          phpunit: 7.5
+          compat: true
+          coverage: false
+        - version: 7.2
+          phpunit: 8.5
+          coverage: false
+        - version: 7.3
+          phpunit: 9.5
+          coverage: true
+        - version: 7.4
+          phpunit: 9.5
+          coverage: false
+        - version: 8.0
+          phpunit: 9.5
+          coverage: false
+        - version: 8.1
+          phpunit: 9.5
+          coverage: false
+        prefer-lowest: ['', '--prefer-lowest']
+
+    name: Unit Tests - PHP ${{ matrix.php.version }} ${{ matrix.prefer-lowest }}
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ matrix.php.version }}
+        extensions: mbstring
+
+    - name: Validate composer.json and composer.lock
+      run: composer validate --strict
+
+    - name: Cache Composer packages
+      id: composer-cache
+      uses: actions/cache@v2
+      with:
+        path: vendor
+        key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-php-
+
+    - name: Remove static analyse tools
+      run: |
+         composer remove --dev --with-all-dependencies --ignore-platform-reqs \
+            squizlabs/php_codesniffer vimeo/psalm slevomat/coding-standard
+
+    - name: Update dependencies
+      run: composer update --prefer-dist --no-progress --with-all-dependencies ${{ matrix.prefer-lowest }}
+
+    - name: Require compatible PHPUnit version
+      run: composer require --dev --with-all-dependencies "phpunit/phpunit:^${{ matrix.php.phpunit }}"
+
+    - name: Make Unit tests compatible
+      if: ${{ matrix.php.compat }}
+      run: /bin/bash tests/compat.sh
+
+    - name: Run test suite
+      if: ${{ ! matrix.php.coverage }}
+      run: ./vendor/bin/phpunit --verbose
+
+    - name: Run test suite with code coverage
+      if: ${{ matrix.php.coverage }}
+      run: ./vendor/bin/phpunit --verbose --coverage-clover=build/logs/clover.xml
+      env:
+        XDEBUG_MODE: coverage
+
+    - name: Run Scrutinizer
+      if: ${{ matrix.php.coverage }}
+      run: |
+        wget -q https://scrutinizer-ci.com/ocular.phar
+        php ocular.phar code-coverage:upload --format=php-clover build/logs/clover.xml || true

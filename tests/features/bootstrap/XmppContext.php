@@ -116,7 +116,7 @@ class XmppContext extends AbstractContext implements Context, SnippetAcceptingCo
     public function xmppServerSupportsAuthenticationMethod($authenticationMethod)
     {
         $data = $this->readStreamUntil('</stream:features>');
-        Assert::assertContains("<mechanism>$authenticationMethod</mechanism>", $data);
+        Assert::assertStringContainsString("<mechanism>$authenticationMethod</mechanism>", $data);
     }
 
     /**
@@ -164,7 +164,7 @@ class XmppContext extends AbstractContext implements Context, SnippetAcceptingCo
      */
     public function respondeToChallengeReceivedForDigestMd5()
     {
-        $data = $this->readStreamUntil('</challenge>');
+        $data = $this->readStreamUntil(array('</challenge>', '</failure>'));
         Assert::assertRegExp("#<challenge xmlns='urn:ietf:params:xml:ns:xmpp-sasl'>[^<]+</challenge>#", $data);
 
         $authenticationObject = $this->authenticationFactory->factory('DIGEST-MD5', new Options(
@@ -189,7 +189,7 @@ class XmppContext extends AbstractContext implements Context, SnippetAcceptingCo
      */
     public function respondeToRspauthChallenge()
     {
-        $data = $this->readStreamUntil('</challenge>');
+        $data = $this->readStreamUntil(array('</challenge>', '</failure>'));
 
         $challenge = base64_decode(substr($data, 52, -12));
 
@@ -203,7 +203,7 @@ class XmppContext extends AbstractContext implements Context, SnippetAcceptingCo
      */
     public function respondeToChallengeForScramSha1()
     {
-        $data = $this->readStreamUntil('</challenge>');
+        $data = $this->readStreamUntil(array('</challenge>', '</failure>'));
         Assert::assertRegExp("#<challenge xmlns='urn:ietf:params:xml:ns:xmpp-sasl'>[^<]+</challenge>#", $data);
 
         $challenge = base64_decode(substr($data, 52, -12));
@@ -220,7 +220,12 @@ class XmppContext extends AbstractContext implements Context, SnippetAcceptingCo
      */
     public function shouldBeAuthenticatedAtXmppServer()
     {
-        $data = $this->read();
+        $data = $this->readStreamUntil(array(
+            "</failure>",
+            "<success xmlns='urn:ietf:params:xml:ns:xmpp-sasl'/>",
+            "</success>"
+        ));
+
         Assert::assertSame("<success xmlns='urn:ietf:params:xml:ns:xmpp-sasl'/>", $data);
     }
 
@@ -229,11 +234,25 @@ class XmppContext extends AbstractContext implements Context, SnippetAcceptingCo
      */
     public function shouldBeAuthenticatedAtXmppServerWithVerification()
     {
-        $data = $this->read();
+        $data = $this->readStreamUntil(array(
+            "</failure>",
+            "<success xmlns='urn:ietf:params:xml:ns:xmpp-sasl'/>",
+            "</success>"
+        ));
         Assert::assertRegExp("#^<success xmlns='urn:ietf:params:xml:ns:xmpp-sasl'>[^<]+</success>$#", $data);
 
         $verfication = base64_decode(substr($data, 50, -10));
 
         Assert::assertTrue($this->authenticationObject->verify($verfication));
+    }
+
+    /**
+     * @AfterScenario
+     */
+    public function closeXMLStream()
+    {
+        if ($this->stream) {
+            $this->write('</stream:stream>');
+        }
     }
 }

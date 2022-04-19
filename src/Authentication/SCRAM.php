@@ -44,14 +44,13 @@ use Fabiang\Sasl\Exception\InvalidArgumentException;
 /**
  * Implementation of SCRAM-* SASL mechanisms.
  * SCRAM mechanisms have 3 main steps (initial response, response to the server challenge, then server signature
- * verification) which keep state-awareness. Therefore a single class instanciation must be done and reused for the whole
- * authentication process.
+ * verification) which keep state-awareness. Therefore a single class instanciation must be done
+ * and reused for the whole authentication process.
  *
  * @author Jehan <jehan.marmottard@gmail.com>
  */
 class SCRAM extends AbstractAuthentication implements ChallengeAuthenticationInterface, VerificationInterface
 {
-
     private $hashAlgo;
     private $hash;
     private $hmac;
@@ -64,12 +63,11 @@ class SCRAM extends AbstractAuthentication implements ChallengeAuthenticationInt
     /**
      * Construct a SCRAM-H client where 'H' is a cryptographic hash function.
      *
+     * @link http://www.iana.org/assignments/hash-function-text-names/hash-function-text-names.xml "Hash Function
+     * Textual Names" format of core PHP hash function.
      * @param Options $options
      * @param string  $hash The name cryptographic hash function 'H' as registered by IANA in the "Hash Function Textual
      * Names" registry.
-     * @link http://www.iana.org/assignments/hash-function-text-names/hash-function-text-names.xml "Hash Function Textual
-     * Names"
-     * format of core PHP hash function.
      * @throws InvalidArgumentException
      */
     public function __construct(Options $options, $hash)
@@ -157,8 +155,8 @@ class SCRAM extends AbstractAuthentication implements ChallengeAuthenticationInt
      * Parses and verifies a non-empty SCRAM challenge.
      *
      * @param  string $challenge The SCRAM challenge
-     * @return string|false      The response to send; false in case of wrong challenge or if an initial response has not
-     * been generated first.
+     * @return string|false      The response to send; false in case of wrong challenge or if an initial response has
+     * not been generated first.
      */
     private function generateResponse($challenge, $password)
     {
@@ -220,8 +218,8 @@ class SCRAM extends AbstractAuthentication implements ChallengeAuthenticationInt
 
     /**
      * SCRAM has also a server verification step. On a successful outcome, it will send additional data which must
-     * absolutely be checked against this function. If this fails, the entity which we are communicating with is probably
-     * not the server as it has not access to your ServerKey.
+     * absolutely be checked against this function. If this fails, the entity which we are communicating with is
+     * probably not the server as it has not access to your ServerKey.
      *
      * @param string $data The additional data sent along a successful outcome.
      * @return bool Whether the server has been authenticated.

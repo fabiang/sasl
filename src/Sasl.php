@@ -46,7 +46,6 @@ use Fabiang\Sasl\Exception\InvalidArgumentException;
  */
 class Sasl
 {
-
     /**
      * Known authentication mechanisms classes.
      *
@@ -72,7 +71,7 @@ class Sasl
      *                             SCRAM-* (any mechanism of the SCRAM family)
      *                      Types are not case sensitive
      * @param Options|array Options for authentication
-     * @return Authentication\AuthenticationInterface
+     * @return \Fabiang\Sasl\Authentication\AuthenticationInterface
      */
     public function factory($type, $options = array())
     {
@@ -94,8 +93,7 @@ class Sasl
             throw new InvalidArgumentException("Invalid SASL mechanism type '$type'");
         }
 
-        $object = new $className($options, $parameter);
-        return $object;
+        return new $className($options, $parameter);
     }
 
     /**
