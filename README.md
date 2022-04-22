@@ -2,6 +2,7 @@
 
 The PHP SASL Authentification Library.
 
+[![PHP Version Require](http://poser.pugx.org/fabiang/sasl/require/php)](https://packagist.org/packages/fabiang/sasl)
 [![Latest Stable Version](https://poser.pugx.org/fabiang/sasl/v/stable.svg)](https://packagist.org/packages/fabiang/sasl)
 [![Total Downloads](https://poser.pugx.org/fabiang/sasl/downloads.svg)](https://packagist.org/packages/fabiang/sasl)
 [![License](https://poser.pugx.org/fabiang/sasl/license.svg)](https://packagist.org/packages/fabiang/sasl)  
@@ -26,7 +27,7 @@ The easiest way to install fabiang/sasl is by using Composer:
 
 ```
 curl -sS https://getcomposer.org/installer | php
-php composer.phar require fabiang/sasl
+composer require fabiang/sasl
 ```
 
 ## Usage
@@ -75,27 +76,22 @@ List of options required by authentication mechanisms.
 For mechanisms that are challenge-based you'll need to call `createResponse()`
 again and send the returned value to the server.
 
-| Mechanism | Authcid | Secret | Authzid  | Service | Hostname | Challenge |
-| --------- | ------- | ------ | -------- | ------- | -------- | --------- |
-| Anonymous | yes     | no     | no       | no      | no       | no        |
-| CramMD5   | yes     | yes    | no       | no      | no       | yes       |
-| DigestMD5 | yes     | yes    | optional | yes     | yes      | yes       |
-| External  | no      | no     | yes      | no      | no       | no        |
-| Login     | yes     | yes    | no       | no      | no       | no        |
-| Plain     | yes     | yes    | optional | no      | no       | no        |
-| SCRAM-*   | yes     | yes    | optional | no      | no       | yes       |
+| Mechanism  | Authcid | Secret | Authzid  | Service | Hostname | Challenge |
+| ---------- | ------- | ------ | -------- | ------- | -------- | --------- |
+| Anonymous  | yes     | no     | no       | no      | no       | no        |
+| Cram-MD5   | yes     | yes    | no       | no      | no       | yes       |
+| Digest-MD5 | yes     | yes    | optional | yes     | yes      | yes       |
+| External   | no      | no     | yes      | no      | no       | no        |
+| Login      | yes     | yes    | no       | no      | no       | no        |
+| Plain      | yes     | yes    | optional | no      | no       | no        |
+| SCRAM-*    | yes     | yes    | optional | no      | no       | yes       |
 
 ## Unit tests
 
 If you like this library and you want to contribute, make sure the unit tests
-and integration tests are running. Composer will help you to install the right
-version of PHPUnit and Behat.
+and integration tests are running.
 
-```
-composer install --dev
-```
-
-After that run the unit tests:
+Run the unit tests:
 
 ```
 ./vendor/bin/phpunit
@@ -132,7 +128,7 @@ After some minutes you'll have the runnig server instances inside of a virtual m
 Now you can run the integration tests:
 
 ```
-./vendor/bin/behat -c tests/behat.yml.dist
+./vendor/bin/behat
 ```
 
 ## License

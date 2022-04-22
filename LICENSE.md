@@ -3,7 +3,7 @@ Modified BSD License
 
 Copyright (c) 2002-2003 Richard Heyes,
               2014 Jaussoin Timothée,
-              2014-2021 Fabian Grutschus
+              2014-2022 Fabian Grutschus
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
