@@ -112,7 +112,7 @@ docker-compose up -d
 
 **Note:** ejabberd takes around *ten minutes* to start.
 
-### Vagrant
+### Vagrant (Deprecated)
 
 To launch the servers you can use the provided Vagrant box.
 Just [install Vagrant](https://www.vagrantup.com/downloads) and run:

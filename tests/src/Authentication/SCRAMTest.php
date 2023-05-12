@@ -4,7 +4,7 @@
  * Sasl library.
  *
  * Copyright (c) 2002-2003 Richard Heyes,
- *               2014-2022 Fabian Grutschus
+ *               2014-2023 Fabian Grutschus
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,7 +37,7 @@
 
 namespace Fabiang\Sasl\Authentication;
 
-use PHPUnit\Framework\TestCase;
+use Fabiang\Sasl\TestCase;
 use Fabiang\Sasl\Options;
 
 /**
@@ -104,7 +104,7 @@ class SCRAMTest extends TestCase
     {
         $options = new Options('u,=ser', 'pass', 'authzid');
         $object  = new SCRAM($options, 'md5');
-        $this->assertRegExp(
+        $this->assertMatchesRegularExpressionCompat(
             '#^n,a=authzid,n=u=2C=3Dser,r=[a-z0-9A-Z=+/]+$#',
             $object->createResponse(null)
         );
@@ -140,12 +140,12 @@ class SCRAMTest extends TestCase
     {
         $this->object->createResponse(null);
 
-        $this->assertRegExp(
+        $this->assertMatchesRegularExpressionCompat(
             '#^c=[a-zA-Z0-9=+/]+,r=[a-zA-Z0-9=+/]+,p=[a-zA-Z0-9=+/]+$#',
             $this->object->createResponse('r=' . $this->object->getCnonce() . ',s=abcdefg=,i=2,a=2')
         );
 
-        $this->assertRegExp('#^[a-zA-Z0-9=+/]+$#', $this->object->getCnonce());
+        $this->assertMatchesRegularExpressionCompat('#^[a-zA-Z0-9=+/]+$#', $this->object->getCnonce());
     }
 
     /**

@@ -1,11 +1,6 @@
 name: Unit Tests
 
-on:
-  push:
-    branches:
-    - '*'
-    pull_request:
-    - '*'
+on: [push, pull_request]
 
 jobs:
   unittest:
@@ -43,7 +38,7 @@ jobs:
           coverage: false
         - version: 7.3
           phpunit: 9.5
-          coverage: true
+          coverage: false
         - version: 7.4
           phpunit: 9.5
           coverage: false
@@ -52,13 +47,16 @@ jobs:
           coverage: false
         - version: 8.1
           phpunit: 9.5
+          coverage: true
+        - version: 8.2
+          phpunit: 10.0
           coverage: false
         prefer-lowest: ['', '--prefer-lowest']
 
     name: Unit Tests - PHP ${{ matrix.php.version }} ${{ matrix.prefer-lowest }}
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Install PHP
       uses: shivammathur/setup-php@v2
@@ -71,7 +69,7 @@ jobs:
 
     - name: Cache Composer packages
       id: composer-cache
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: vendor
         key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
@@ -95,11 +93,19 @@ jobs:
 
     - name: Run test suite
       if: ${{ ! matrix.php.coverage }}
-      run: ./vendor/bin/phpunit --verbose
+      run: |
+        ./vendor/bin/phpunit \
+          --no-configuration \
+          tests/src/
 
     - name: Run test suite with code coverage
       if: ${{ matrix.php.coverage }}
-      run: ./vendor/bin/phpunit --verbose --coverage-clover=build/logs/clover.xml
+      run: |
+        ./vendor/bin/phpunit \
+          --no-configuration \
+          --coverage-clover build/logs/clover.xml \
+          --coverage-filter src/ \
+          tests/src/
       env:
         XDEBUG_MODE: coverage
 

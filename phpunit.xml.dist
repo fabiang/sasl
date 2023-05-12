@@ -5,7 +5,7 @@
  * Sasl library.
  *
  * Copyright (c) 2002-2003 Richard Heyes,
- *               2014-2022 Fabian Grutschus
+ *               2014-2023 Fabian Grutschus
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -39,7 +39,7 @@
 
 <phpunit
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/8.5/phpunit.xsd"
+    xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/10.0/phpunit.xsd"
     colors="true"
     convertErrorsToExceptions="true"
     convertNoticesToExceptions="true"
@@ -50,22 +50,23 @@
     checkForUnintentionallyCoveredCode="true"
     beStrictAboutOutputDuringTests="true"
     beStrictAboutTestSize="true"
-    beStrictAboutTodoAnnotatedTests="true">
+    beStrictAboutTodoAnnotatedTests="true"
+>
 
-        <testsuites>
-            <testsuite name="Fabiang_Sasl">
-                <directory>tests/src/</directory>
-            </testsuite>
-        </testsuites>
+    <testsuites>
+        <testsuite name="Fabiang_Sasl">
+            <directory>tests/src/</directory>
+        </testsuite>
+    </testsuites>
 
-        <filter>
-            <whitelist>
-                <directory>src/</directory>
-            </whitelist>
-        </filter>
+    <filter>
+        <whitelist>
+            <directory>src/</directory>
+        </whitelist>
+    </filter>
 
-        <php>
-            <ini name="error_reporting" value="-1"/>
-            <ini name="date.timezone" value="Europe/Berlin"/>
-        </php>
+    <php>
+        <ini name="error_reporting" value="-1"/>
+        <ini name="date.timezone" value="Europe/Berlin"/>
+    </php>
 </phpunit>

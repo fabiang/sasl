@@ -1,29 +1,29 @@
 imports:
-    - php
+  - php
 
 filter:
-    paths:
-        - src/*
+  paths:
+    - src/*
 
 checks:
-    php: true
+  php: true
 
 tools:
-    php_code_sniffer:
-        config:
-            standard: PSR2
-    php_sim: true
-    php_cpd: true
-    php_loc: true
-    php_hhvm: false
-    php_mess_detector: true
-    php_pdepend: true
-    php_analyzer: true
-    sensiolabs_security_checker: true
-    php_changetracking: true
-    external_code_coverage:
-        runs: 2
-        timeout: 120
+  php_code_sniffer:
+    config:
+      standard: PSR2
+  php_sim: true
+  php_cpd: true
+  php_loc: true
+  php_hhvm: false
+  php_mess_detector: true
+  php_pdepend: true
+  php_analyzer: true
+  sensiolabs_security_checker: true
+  php_changetracking: true
+  external_code_coverage:
+    runs: 2
+    timeout: 120
 
 build:
   environment:

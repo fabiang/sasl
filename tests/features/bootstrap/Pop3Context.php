@@ -4,7 +4,7 @@
  * Sasl library.
  *
  * Copyright (c) 2002-2003 Richard Heyes,
- *               2014-2022 Fabian Grutschus
+ *               2014-2023 Fabian Grutschus
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -112,7 +112,7 @@ class Pop3Context extends AbstractContext implements Context, SnippetAcceptingCo
     {
         $this->write("AUTH $mechanism\r\n");
         $challenge = $this->read();
-        Assert::assertRegExp('/^\+ [a-zA-Z0-9]+/', $challenge);
+        Assert::assertMatchesRegularExpression('/^\+ [a-zA-Z0-9]+/', $challenge);
         $this->challenge = base64_decode(substr(trim($challenge), 2));
     }
 
