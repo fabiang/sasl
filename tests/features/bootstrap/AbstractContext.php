@@ -4,7 +4,7 @@
  * Sasl library.
  *
  * Copyright (c) 2002-2003 Richard Heyes,
- *               2014-2022 Fabian Grutschus
+ *               2014-2023 Fabian Grutschus
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -111,8 +111,8 @@ abstract class AbstractContext
 
     protected function write($data)
     {
-        fwrite($this->stream, $data);
         fwrite($this->logfile, 'C: ' . trim($data) . "\n");
+        fwrite($this->stream, $data);
     }
 
     /**

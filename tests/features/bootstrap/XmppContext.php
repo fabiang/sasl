@@ -4,7 +4,7 @@
  * Sasl library.
  *
  * Copyright (c) 2002-2003 Richard Heyes,
- *               2014-2022 Fabian Grutschus
+ *               2014-2023 Fabian Grutschus
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -165,7 +165,10 @@ class XmppContext extends AbstractContext implements Context, SnippetAcceptingCo
     public function respondeToChallengeReceivedForDigestMd5()
     {
         $data = $this->readStreamUntil(array('</challenge>', '</failure>'));
-        Assert::assertRegExp("#<challenge xmlns='urn:ietf:params:xml:ns:xmpp-sasl'>[^<]+</challenge>#", $data);
+        Assert::assertMatchesRegularExpression(
+            "#<challenge xmlns='urn:ietf:params:xml:ns:xmpp-sasl'>[^<]+</challenge>#",
+            $data
+        );
 
         $authenticationObject = $this->authenticationFactory->factory('DIGEST-MD5', new Options(
             $this->username,
@@ -193,7 +196,7 @@ class XmppContext extends AbstractContext implements Context, SnippetAcceptingCo
 
         $challenge = base64_decode(substr($data, 52, -12));
 
-        Assert::assertRegExp('/^rspauth=.+$/', $challenge);
+        Assert::assertMatchesRegularExpression('/^rspauth=.+$/', $challenge);
 
         $this->write("<response xmlns='urn:ietf:params:xml:ns:xmpp-sasl'/>");
     }
@@ -204,7 +207,10 @@ class XmppContext extends AbstractContext implements Context, SnippetAcceptingCo
     public function respondeToChallengeForScramSha1()
     {
         $data = $this->readStreamUntil(array('</challenge>', '</failure>'));
-        Assert::assertRegExp("#<challenge xmlns='urn:ietf:params:xml:ns:xmpp-sasl'>[^<]+</challenge>#", $data);
+        Assert::assertMatchesRegularExpression(
+            "#<challenge xmlns='urn:ietf:params:xml:ns:xmpp-sasl'>[^<]+</challenge>#",
+            $data
+        );
 
         $challenge = base64_decode(substr($data, 52, -12));
 
@@ -239,7 +245,10 @@ class XmppContext extends AbstractContext implements Context, SnippetAcceptingCo
             "<success xmlns='urn:ietf:params:xml:ns:xmpp-sasl'/>",
             "</success>"
         ));
-        Assert::assertRegExp("#^<success xmlns='urn:ietf:params:xml:ns:xmpp-sasl'>[^<]+</success>$#", $data);
+        Assert::assertMatchesRegularExpression(
+            "#^<success xmlns='urn:ietf:params:xml:ns:xmpp-sasl'>[^<]+</success>$#",
+            $data
+        );
 
         $verfication = base64_decode(substr($data, 50, -10));
 

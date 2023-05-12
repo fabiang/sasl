@@ -31,12 +31,13 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Fabiang\\Sasl\\Behat\\": "tests/features/bootstrap"
+            "Fabiang\\Sasl\\Behat\\": "tests/features/bootstrap",
+            "Fabiang\\Sasl\\": "tests/src"
         },
         "files": ["tests/compat.php"]
     },
     "require": {
-        "php": "^5.3.3 || ^7.0 || ~8.0.0 || ~8.1.0"
+        "php": "^5.3.3 || ^7.0 || ~8.0.0 || ~8.1.0 || ~8.2.0"
     },
     "require-dev": {
         "behat/behat": "^3.6",
@@ -57,10 +58,10 @@
         "phpunit": "phpunit",
         "behat": "behat",
         "test": [
-            "@phpunit",
-            "@behat",
             "@psalm",
-            "@phpcs"
+            "@phpcs",
+            "@phpunit",
+            "@behat"
         ]
     }
 }

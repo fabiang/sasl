@@ -4,7 +4,7 @@
  * Sasl library.
  *
  * Copyright (c) 2002-2003 Richard Heyes,
- *               2014-2022 Fabian Grutschus
+ *               2014-2023 Fabian Grutschus
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,7 +37,7 @@
 
 namespace Fabiang\Sasl\Authentication;
 
-use PHPUnit\Framework\TestCase;
+use Fabiang\Sasl\TestCase;
 use Fabiang\Sasl\Options;
 
 /**
@@ -79,7 +79,7 @@ class DigestMD5Test extends TestCase
      */
     public function testGetResponseRealm()
     {
-         $this->assertRegExp(
+         $this->assertMatchesRegularExpressionCompat(
              '#^username="authcid",realm="localhost",authzid="authzid",'
              . 'nonce="abcdefghijklmnopqrstuvw",cnonce="[^"]+",nc=00000001,'
              . 'qop=auth,digest-uri="service/hostname",response=[^,]+,maxbuf=65536$#',
@@ -118,7 +118,7 @@ class DigestMD5Test extends TestCase
     {
         DigestMD5::$useDevRandom = false;
 
-         $this->assertRegExp(
+         $this->assertMatchesRegularExpressionCompat(
              '#^username="authcid",realm="localhost",authzid="authzid",'
              . 'nonce="abcdefghijklmnopqrstuvw",cnonce="[^"]+",nc=00000001,'
              . 'qop=auth,digest-uri="service/hostname",response=[^,]+,maxbuf=65536$#',
@@ -142,7 +142,7 @@ class DigestMD5Test extends TestCase
      */
     public function testGetResponseNoRealm()
     {
-         $this->assertRegExp(
+         $this->assertMatchesRegularExpressionCompat(
              '#^username="authcid",authzid="authzid",nonce="abcdefghijklmnopqrstuvw",cnonce="[^"]+",nc=00000001,'
              . 'qop=auth,digest-uri="service/hostname",response=[^,]+,maxbuf=65536$#',
              $this->object->createResponse(
@@ -166,7 +166,7 @@ class DigestMD5Test extends TestCase
         $options = new Options('authcid', 'pass', '', 'service', 'hostname');
         $object  = new DigestMD5($options);
 
-         $this->assertRegExp(
+         $this->assertMatchesRegularExpressionCompat(
              '#^username="authcid",nonce="abcdefghijklmnopqrstuvw",cnonce="[^"]+",nc=00000001,'
              . 'qop=auth,digest-uri="service/hostname",response=[^,]+,maxbuf=65536$#',
              $object->createResponse(

@@ -544,7 +544,7 @@ sql_server: "{{ env['EJABBERD_ODBC_SERVER'] }}"
 sql_database: "{{ env['EJABBERD_ODBC_DATABASE'] }}"
 sql_username: "{{ env['EJABBERD_ODBC_USERNAME'] }}"
 sql_password: "{{ env['EJABBERD_ODBC_PASSWORD'] }}"
-sql_keepalive_interval: "{{ env.get('EJABBERD_ODBC_KEEPALIVE_INTERVAL', 60) }}"
+# sql_keepalive_interval: "{{ env.get('EJABBERD_ODBC_KEEPALIVE_INTERVAL', 60) }}"
 
 default_db: sql
 {% endif %}

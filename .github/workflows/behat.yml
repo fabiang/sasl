@@ -1,25 +1,18 @@
 name: Integration Tests
 
-on:
-  push:
-    branches:
-    - '*'
-    pull_request:
-    - '*'
+on: [push, pull_request]
 
 jobs:
   integrationtest:
     runs-on: ubuntu-latest
-
     name: Behat
-
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Install PHP
       uses: shivammathur/setup-php@v2
       with:
-        php-version: 8.1
+        php-version: 8.2
 
     - name: Cache Composer packages
       id: composer-cache
@@ -33,12 +26,21 @@ jobs:
     - name: Install dependencies
       run: composer install --prefer-dist --no-progress
 
-    - name: Build the stack
-      run: docker-compose up -d
+    - name: Run containers
+      run: docker-compose up -d --quiet-pull
 
-    - name: Sleep for 10 minutes
-      run: sleep 10m
-      shell: bash
+    - name: Wait for XMPP to become available
+      uses: iFaxity/wait-on-action@v1
+      with:
+        resource: tcp:localhost:15222
+        timeout: 1800000
+        interval: 10000
+        delay: 60000
+        log: true
 
     - name: Run test suite
       run: ./vendor/bin/behat
+
+    - name: Stop containers
+      if: always()
+      run: docker-compose down --volumes

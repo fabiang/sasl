@@ -4,7 +4,7 @@
  * Sasl library.
  *
  * Copyright (c) 2002-2003 Richard Heyes,
- *               2014-2022 Fabian Grutschus
+ *               2014-2023 Fabian Grutschus
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,7 +37,7 @@
 
 namespace Fabiang\Sasl\Authentication;
 
-use PHPUnit\Framework\TestCase;
+use Fabiang\Sasl\TestCase;
 use Fabiang\Sasl\Options;
 
 /**

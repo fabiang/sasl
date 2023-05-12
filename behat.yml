@@ -1,20 +1,20 @@
 default:
-    suites:
-        authentication_features:
-            paths: [ "%paths.base%/tests/features/" ]
-            contexts:
-                - Fabiang\Sasl\Behat\XmppContext:
-                    - localhost
-                    - 15222
-                    - ubuntu-xenial
-                    - testuser
-                    - testpass
-                    - "%paths.base%/tests/log/features/"
-                - Fabiang\Sasl\Behat\Pop3Context:
-                    - localhost
-                    - 11110
-                    - vmail
-                    - pass
-                    - "%paths.base%/tests/log/features/"
-    testers:
-        strict: true
+  suites:
+    authentication_features:
+      paths: [ "%paths.base%/tests/features/" ]
+      contexts:
+        - Fabiang\Sasl\Behat\XmppContext:
+          - localhost
+          - 15222
+          - ubuntu-xenial
+          - testuser
+          - testpass
+          - "%paths.base%/tests/log/features/"
+        - Fabiang\Sasl\Behat\Pop3Context:
+          - localhost
+          - 11110
+          - vmail
+          - pass
+          - "%paths.base%/tests/log/features/"
+  testers:
+    strict: true
