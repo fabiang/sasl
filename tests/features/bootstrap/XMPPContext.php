@@ -37,10 +37,7 @@
 
 namespace Fabiang\Sasl\Behat;
 
-use Behat\Behat\Context\Context;
-use Behat\Behat\Context\SnippetAcceptingContext;
 use PHPUnit\Framework\Assert;
-use Fabiang\Sasl\Sasl;
 use Fabiang\Sasl\Options;
 
 /**
@@ -48,53 +45,54 @@ use Fabiang\Sasl\Options;
  *
  * @author Fabian Grutschus <f.grutschus@lubyte.de>
  */
-class XmppContext extends AbstractContext implements Context, SnippetAcceptingContext
+class XMPPContext extends AbstractXMPPContext
 {
-
-    protected $hostname;
-    protected $port;
-    protected $domain;
-    protected $username;
-    protected $password;
-
     /**
-     * @var \Fabiang\Sasl\Authentication\AuthenticationInterface
+     * @When authenticate with method SCRAM-SHA-1
      */
-    protected $authenticationObject;
-
-    /**
-     * @var Sasl
-     */
-    protected $authenticationFactory;
-
-    /**
-     * Initializes context.
-     *
-     * Every scenario gets its own context instance.
-     * You can also pass arbitrary arguments to the
-     * context constructor through behat.yml.
-     *
-     * @param string  $hostname Hostname for connection
-     * @param integer $port
-     * @param string  $domain
-     * @param string  $username Domain name of server (important for connecting)
-     * @param string  $password
-     * @param string  $logdir
-     */
-    public function __construct($hostname, $port, $domain, $username, $password, $logdir)
+    public function authenticateWithMethodScramSha1()
     {
-        $this->hostname = $hostname;
-        $this->port     = (int) $port;
-        $this->domain   = $domain;
-        $this->username = $username;
-        $this->password = $password;
+        $this->authenticationObject = $this->authenticationFactory->factory(
+            'scram-sha-1',
+            new Options($this->username, $this->password)
+        );
 
-        if (!is_dir($logdir)) {
-            mkdir($logdir, 0777, true);
-        }
+        $authData = base64_encode($this->authenticationObject->createResponse());
+        $this->write(
+            "<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='SCRAM-SHA-1'>$authData</auth>"
+        );
+    }
 
-        $this->authenticationFactory = new Sasl;
-        $this->logdir = $logdir;
+    /**
+     * @When authenticate with method SCRAM-SHA-256
+     */
+    public function authenticateWithMethodScramSha256()
+    {
+        $this->authenticationObject = $this->authenticationFactory->factory(
+            'scram-sha-256',
+            new Options($this->username, $this->password)
+        );
+
+        $authData = base64_encode($this->authenticationObject->createResponse());
+        $this->write(
+            "<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='SCRAM-SHA-256'>$authData</auth>"
+        );
+    }
+
+    /**
+     * @When authenticate with method SCRAM-SHA-512
+     */
+    public function authenticateWithMethodScramSha512()
+    {
+        $this->authenticationObject = $this->authenticationFactory->factory(
+            'scram-sha-512',
+            new Options($this->username, $this->password)
+        );
+
+        $authData = base64_encode($this->authenticationObject->createResponse());
+        $this->write(
+            "<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='SCRAM-SHA-512'>$authData</auth>"
+        );
     }
 
     /**
@@ -144,25 +142,9 @@ class XmppContext extends AbstractContext implements Context, SnippetAcceptingCo
     }
 
     /**
-     * @When authenticate with method SCRAM-SHA-1
+     * @When response to challenge received for DIGEST-MD5
      */
-    public function authenticateWithMethodScramSha1()
-    {
-        $this->authenticationObject = $this->authenticationFactory->factory(
-            'scram-sha-1',
-            new Options($this->username, $this->password)
-        );
-
-        $authData = base64_encode($this->authenticationObject->createResponse());
-        $this->write(
-            "<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='SCRAM-SHA-1'>$authData</auth>"
-        );
-    }
-
-    /**
-     * @When responde to challenge received for DIGEST-MD5
-     */
-    public function respondeToChallengeReceivedForDigestMd5()
+    public function responseToChallengeReceivedForDigestMd5()
     {
         $data = $this->readStreamUntil(array('</challenge>', '</failure>'));
         Assert::assertMatchesRegularExpression(
@@ -188,9 +170,9 @@ class XmppContext extends AbstractContext implements Context, SnippetAcceptingCo
     }
 
     /**
-     * @When responde to rspauth challenge
+     * @When response to rspauth challenge
      */
-    public function respondeToRspauthChallenge()
+    public function responseToRspauthChallenge()
     {
         $data = $this->readStreamUntil(array('</challenge>', '</failure>'));
 
@@ -202,9 +184,9 @@ class XmppContext extends AbstractContext implements Context, SnippetAcceptingCo
     }
 
     /**
-     * @When responde to challenge for SCRAM-SHA-1
+     * @When response to challenge for SCRAM-SHA-:hash
      */
-    public function respondeToChallengeForScramSha1()
+    public function responseToChallengeForScramSha($hash)
     {
         $data = $this->readStreamUntil(array('</challenge>', '</failure>'));
         Assert::assertMatchesRegularExpression(

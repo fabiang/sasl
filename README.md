@@ -107,21 +107,10 @@ To launch the servers you can use the provided Docker Compose file.
 Just [install Docker](https://www.docker.com/get-started/) and run:
 
 ```
-docker-compose up -d
+docker compose up -d
 ```
 
-**Note:** ejabberd takes around *ten minutes* to start.
-
-### Vagrant (Deprecated)
-
-To launch the servers you can use the provided Vagrant box.
-Just [install Vagrant](https://www.vagrantup.com/downloads) and run:
-
-```
-vagrant up
-```
-
-After some minutes you'll have the runnig server instances inside of a virtual machine.
+**Note:** ejabberd takes up to *twenty minutes* to start.
 
 ### RUN
 

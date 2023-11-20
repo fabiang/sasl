@@ -76,7 +76,7 @@ class SCRAM extends AbstractAuthentication implements ChallengeAuthenticationInt
 
         // Though I could be strict, I will actually also accept the naming used in the PHP core hash framework.
         // For instance "sha1" is accepted, while the registered hash name should be "SHA-1".
-        $normalizedHash = str_replace('-', '', strtolower($hash));
+        $normalizedHash = strtolower(preg_replace('#^sha-(\d+)#i', 'sha\1', $hash));
 
         $hashAlgos = hash_algos();
         if (!in_array($normalizedHash, $hashAlgos)) {

@@ -3,14 +3,14 @@ default:
     authentication_features:
       paths: [ "%paths.base%/tests/features/" ]
       contexts:
-        - Fabiang\Sasl\Behat\XmppContext:
+        - Fabiang\Sasl\Behat\XMPPContext:
           - localhost
           - 15222
-          - ubuntu-xenial
+          - localhost
           - testuser
           - testpass
           - "%paths.base%/tests/log/features/"
-        - Fabiang\Sasl\Behat\Pop3Context:
+        - Fabiang\Sasl\Behat\POP3Context:
           - localhost
           - 11110
           - vmail

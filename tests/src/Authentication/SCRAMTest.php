@@ -68,15 +68,92 @@ class SCRAMTest extends TestCase
     }
 
     /**
+     * @param string $input
+     * @param string $expected
+     * @dataProvider provideOldHashAlgos
      * @covers ::__construct
      * @covers ::getHashAlgo
      * @uses Fabiang\Sasl\Options
      * @uses Fabiang\Sasl\Authentication\AbstractAuthentication::__construct
      */
-    public function testConstructor()
+    public function testConstructor($input, $expected)
     {
-        $object = new SCRAM(new Options('test'), 'sha-1');
-        $this->assertSame('sha1', $object->getHashAlgo());
+        $object = new SCRAM(new Options('test'), $input);
+        $this->assertSame($expected, $object->getHashAlgo());
+    }
+
+    /**
+     * @return array
+     */
+    public static function provideOldHashAlgos()
+    {
+        return array(
+            array(
+                'input'    => 'sha1',
+                'expected' => 'sha1',
+            ),
+            array(
+                'input'    => 'sha-1',
+                'expected' => 'sha1',
+            ),
+            array(
+                'input'    => 'SHA-1',
+                'expected' => 'sha1',
+            ),
+            array(
+                'input'    => 'sha256',
+                'expected' => 'sha256',
+            ),
+            array(
+                'input'    => 'sha-256',
+                'expected' => 'sha256',
+            ),
+            array(
+                'input'    => 'sha512',
+                'expected' => 'sha512',
+            ),
+            array(
+                'input'    => 'sha-512',
+                'expected' => 'sha512',
+            ),
+        );
+    }
+
+    /**
+     * @requires PHP 7.1
+     * @param string $input
+     * @param string $expected
+     * @dataProvider provideNewHashAlgos
+     * @covers ::__construct
+     * @covers ::getHashAlgo
+     * @uses Fabiang\Sasl\Options
+     * @uses Fabiang\Sasl\Authentication\AbstractAuthentication::__construct
+     */
+    public function testConstructorNewAlogs($input, $expected)
+    {
+        $object = new SCRAM(new Options('test'), $input);
+        $this->assertSame($expected, $object->getHashAlgo());
+    }
+
+    /**
+     * @return array
+     */
+    public static function provideNewHashAlgos()
+    {
+        return array(
+            array(
+                'input'    => 'sha3-256',
+                'expected' => 'sha3-256',
+            ),
+            array(
+                'input'    => 'sha3-512',
+                'expected' => 'sha3-512',
+            ),
+            array(
+                'input'    => 'sha-3-512',
+                'expected' => 'sha3-512',
+            ),
+        );
     }
 
     /**

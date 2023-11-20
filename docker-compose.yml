@@ -1,28 +1,14 @@
 version: '3'
 services:
   xmpp:
-    image: rroemhild/ejabberd:18.12
-    hostname: ubuntu-xenial
+    image: ejabberd/ecs:${EJABBERD_VERSION:-23.10}
     volumes:
-      - "./tests/config/ejabberd/ejabberd.yml.tpl:/opt/ejabberd/conf/ejabberd.yml.tpl"
-      - "./tests/config/ejabberd/ejabberd.db:/opt/ejabberd/database/ejabberd.db"
-    environment:
-      - XMPP_DOMAIN=ubuntu-xenial
-      - "EJABBERD_USERS=testuser@ubuntu-xenial:testpass admin@ubuntu-xenial"
-      - EJABBERD_ADMINS=admin@ubuntu-xenial
-      - TZ=Europe/Berlin
-      - EJABBERD_STARTTLS=false
-      - EJABBERD_S2S_SSL=false
-      - EJABBERD_SKIP_MAKE_SSLCERT=true
-      - EJABBERD_LOGLEVEL=5
-      - EJABBERD_DEBUG_MODE=true
-      - EJABBERD_AUTH_METHOD=sql
-      - EJABBERD_AUTH_PASSWORD_FORMAT=plain
-      - EJABBERD_CONFIGURE_ODBC=true
-      - EJABBERD_ODBC_TYPE=sqlite
-      - EJABBERD_ODBC_DATABASE=/opt/ejabberd/database/ejabberd.db
+      - "./tests/config/ejabberd/ejabberd.yml:/home/ejabberd/conf/ejabberd.yml"
+      - "./tests/config/ejabberd/ejabberd.db:/home/ejabberd/database/ejabberd.db"
     ports:
       - "15222:5222"
+    environment:
+      - CTL_ON_CREATE=register testuser localhost testpass
 
   mail:
     image: dovecot/dovecot:2.3.18

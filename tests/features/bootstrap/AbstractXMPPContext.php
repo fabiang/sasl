@@ -39,20 +39,18 @@ namespace Fabiang\Sasl\Behat;
 
 use Behat\Behat\Context\Context;
 use Behat\Behat\Context\SnippetAcceptingContext;
-use PHPUnit\Framework\Assert;
 use Fabiang\Sasl\Sasl;
-use Fabiang\Sasl\Options;
 
 /**
- * Defines application features from the specific context.
+ * Description of AbstractXMPPContext
  *
- * @author Fabian Grutschus <f.grutschus@lubyte.de>
+ * @author fabian.grutschus
  */
-class Pop3Context extends AbstractContext implements Context, SnippetAcceptingContext
+abstract class AbstractXMPPContext extends AbstractContext implements Context, SnippetAcceptingContext
 {
-
     protected $hostname;
     protected $port;
+    protected $domain;
     protected $username;
     protected $password;
 
@@ -66,8 +64,6 @@ class Pop3Context extends AbstractContext implements Context, SnippetAcceptingCo
      */
     protected $authenticationFactory;
 
-    protected $challenge;
-
     /**
      * Initializes context.
      *
@@ -77,14 +73,16 @@ class Pop3Context extends AbstractContext implements Context, SnippetAcceptingCo
      *
      * @param string  $hostname Hostname for connection
      * @param integer $port
-     * @param string  $username
+     * @param string  $domain
+     * @param string  $username Domain name of server (important for connecting)
      * @param string  $password
      * @param string  $logdir
      */
-    public function __construct($hostname, $port, $username, $password, $logdir)
+    public function __construct($hostname, $port, $domain, $username, $password, $logdir)
     {
         $this->hostname = $hostname;
         $this->port     = (int) $port;
+        $this->domain   = $domain;
         $this->username = $username;
         $this->password = $password;
 
@@ -94,46 +92,5 @@ class Pop3Context extends AbstractContext implements Context, SnippetAcceptingCo
 
         $this->authenticationFactory = new Sasl;
         $this->logdir = $logdir;
-    }
-
-    /**
-     * @Given Connection to pop3 server
-     */
-    public function connectionToPopServer()
-    {
-        $this->connect();
-        Assert::assertSame("+OK Dovecot ready.\r\n", $this->read());
-    }
-
-    /**
-     * @Given challenge received at auth request method :mechanism
-     */
-    public function challengeReceivedAtAuthRequestMethod($mechanism)
-    {
-        $this->write("AUTH $mechanism\r\n");
-        $challenge = $this->read();
-        Assert::assertMatchesRegularExpression('/^\+ [a-zA-Z0-9]+/', $challenge);
-        $this->challenge = base64_decode(substr(trim($challenge), 2));
-    }
-
-    /**
-     * @When Autenticate with CRAM-MD5
-     */
-    public function autenticateWithCramMd5()
-    {
-        $authenticationObject = $this->authenticationFactory->factory(
-            'CRAM-MD5',
-            new Options($this->username, $this->password)
-        );
-        $response = base64_encode($authenticationObject->createResponse($this->challenge));
-        $this->write("$response\r\n");
-    }
-
-    /**
-     * @Then should be authenticate at pop3 server
-     */
-    public function shouldBeAuthenticateAtPopServer()
-    {
-        Assert::assertSame("+OK Logged in.\r\n", $this->read());
     }
 }
