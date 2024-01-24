@@ -47,8 +47,11 @@ jobs:
           coverage: false
         - version: 8.1
           phpunit: 9.5
-          coverage: true
+          coverage: false
         - version: 8.2
+          phpunit: 10.0
+          coverage: true
+        - version: 8.3
           phpunit: 10.0
           coverage: false
         prefer-lowest: ['', '--prefer-lowest']
