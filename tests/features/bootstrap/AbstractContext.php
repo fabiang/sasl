@@ -47,6 +47,11 @@ use Behat\Behat\Hook\Scope\BeforeScenarioScope;
  */
 abstract class AbstractContext
 {
+    protected $hostname;
+    protected $port;
+    protected $username;
+    protected $password;
+
     protected $stream;
     protected $logdir;
     protected $logfile;

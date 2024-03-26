@@ -48,11 +48,7 @@ use Fabiang\Sasl\Sasl;
  */
 abstract class AbstractXMPPContext extends AbstractContext implements Context, SnippetAcceptingContext
 {
-    protected $hostname;
-    protected $port;
     protected $domain;
-    protected $username;
-    protected $password;
 
     /**
      * @var \Fabiang\Sasl\Authentication\AuthenticationInterface
