@@ -5,7 +5,7 @@ The PHP SASL Authentification Library.
 [![PHP Version Require](http://poser.pugx.org/fabiang/sasl/require/php)](https://packagist.org/packages/fabiang/sasl)
 [![Latest Stable Version](https://poser.pugx.org/fabiang/sasl/v/stable.svg)](https://packagist.org/packages/fabiang/sasl)
 [![Total Downloads](https://poser.pugx.org/fabiang/sasl/downloads.svg)](https://packagist.org/packages/fabiang/sasl)
-[![License](https://poser.pugx.org/fabiang/sasl/license.svg)](https://packagist.org/packages/fabiang/sasl)  
+[![License](https://poser.pugx.org/fabiang/sasl/license.svg)](https://packagist.org/packages/fabiang/sasl)
 [![Unit Tests](https://github.com/fabiang/sasl/actions/workflows/unit.yml/badge.svg?branch=develop)](https://github.com/fabiang/sasl/actions/workflows/unit.yml)
 [![Integration Tests](https://github.com/fabiang/sasl/actions/workflows/behat.yml/badge.svg?branch=develop)](https://github.com/fabiang/sasl/actions/workflows/behat.yml)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/fabiang/sasl/badges/quality-score.png?b=develop)](https://scrutinizer-ci.com/g/fabiang/sasl/?branch=develop)
@@ -69,6 +69,25 @@ $mechanism->verify($data);
 ```
 
 If the method returns false you should disconnect.
+
+### SCRAM downgrade protection
+
+To enable [downgrade protection for SCRAM](https://xmpp.org/extensions/xep-0474.html), you'll need to pass
+the allowed authentication mechanisms and channel-binding types via options to the factory:
+
+```php
+$mechanism = $factory->factory('SCRAM-SHA-1', array(
+    'authcid'  => 'username',
+    'secret'   => 'password',
+    'authzid'  => 'authzid', // optional. Username to proxy as
+    'service'  => 'servicename', // optional. Name of the service
+    'hostname' => 'hostname', // optional. Hostname of the service
+    'downgrade_protection' => array( // optional. When `null` downgrade protection string from server won't be validated
+        'allowed_mechanisms'       => array('SCRAM-SHA-1-PLUS', 'SCRAM-SHA-1'), // allowed mechanisms by the server
+        'allowed_channel_bindings' => array('tls-unique', 'tls-exporter', 'tls-server-end-point'), // allowed channel-binding types by the server
+    ),
+));
+```
 
 ### Required options
 

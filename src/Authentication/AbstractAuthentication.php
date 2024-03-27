@@ -99,4 +99,44 @@ abstract class AbstractAuthentication
 
         return base64_encode($cnonce);
     }
+
+    /**
+     * Generate downgrade protection string
+     *
+     * @return string
+     */
+    protected function generateDowngradeProtectionVerification()
+    {
+        $downgradeProtectionOptions = $this->options->getDowngradeProtection();
+
+        $allowedMechanisms      = $downgradeProtectionOptions->getAllowedMechanisms();
+        $allowedChannelBindings = $downgradeProtectionOptions->getAllowedChannelBindings();
+
+        if (count($allowedMechanisms) === 0 && count($allowedChannelBindings) === 0) {
+            return '';
+        }
+
+        usort($allowedMechanisms, array($this, 'sortOctetCollation'));
+        usort($allowedChannelBindings, array($this, 'sortOctetCollation'));
+
+        $protect = implode(',', $allowedMechanisms);
+        if (count($allowedChannelBindings) > 0) {
+            $protect .= '|' . implode(',', $allowedChannelBindings);
+        }
+        return $protect;
+    }
+
+    /**
+     * @param string $a
+     * @param string $b
+     * @return int
+     * @link https://datatracker.ietf.org/doc/html/rfc4790#page-22
+     */
+    private function sortOctetCollation($a, $b)
+    {
+        if ($a == $b) {
+            return 0;
+        }
+        return ($a < $b) ? -1 : 1;
+    }
 }

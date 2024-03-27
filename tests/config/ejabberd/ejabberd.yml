@@ -19,10 +19,12 @@ hosts:
 
 loglevel: debug
 
-## If you already have certificates, list them here
-# certfiles:
-#  - /etc/letsencrypt/live/domain.tld/fullchain.pem
-#  - /etc/letsencrypt/live/domain.tld/privkey.pem
+certfiles:
+  - /home/ejabberd/conf/server.pem
+
+ca_file: "/home/ejabberd/conf/cacert.pem"
+
+# disable_sasl_mechanisms: [SCRAM-SHA-512, SCRAM-SHA-512-PLUS, SCRAM-SHA-256, SCRAM-SHA-256-PLUS, X-OAUTH2, DIGEST-MD5, PLAIN]
 
 listen:
   -
@@ -33,14 +35,15 @@ listen:
     shaper: c2s_shaper
     access: c2s
     starttls_required: false
-#  -
-#    port: 5223
-#    ip: "::"
-#    module: ejabberd_c2s
-#    max_stanza_size: 262144
-#    shaper: c2s_shaper
-#    access: c2s
-#    tls: true
+    starttls: true
+  -
+    port: 5223
+    ip: "::"
+    module: ejabberd_c2s
+    max_stanza_size: 262144
+    shaper: c2s_shaper
+    access: c2s
+    tls: true
 #  -
 #    port: 5269
 #    ip: "::"

@@ -1,6 +1,7 @@
 <?php
 // @codingStandardsIgnoreFile
 // phpcs:ignore
+// @codeCoverageIgnoreStart
 if (!interface_exists('Throwable')) {
     interface Throwable
     {
@@ -22,3 +23,4 @@ if (!interface_exists('Throwable')) {
         public function __toString();
     }
 }
+// @codeCoverageIgnoreEnd

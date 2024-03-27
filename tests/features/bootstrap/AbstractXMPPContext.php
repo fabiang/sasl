@@ -40,6 +40,8 @@ namespace Fabiang\Sasl\Behat;
 use Behat\Behat\Context\Context;
 use Behat\Behat\Context\SnippetAcceptingContext;
 use Fabiang\Sasl\Sasl;
+use Fabiang\Sasl\Options;
+use Fabiang\Sasl\Options\DowngradeProtectionOptions;
 
 /**
  * Description of AbstractXMPPContext
@@ -48,7 +50,15 @@ use Fabiang\Sasl\Sasl;
  */
 abstract class AbstractXMPPContext extends AbstractContext implements Context, SnippetAcceptingContext
 {
+    /**
+     * @var string
+     */
     protected $domain;
+
+    /**
+     * @var string
+     */
+    protected $tlsversion;
 
     /**
      * @var \Fabiang\Sasl\Authentication\AuthenticationInterface
@@ -59,6 +69,9 @@ abstract class AbstractXMPPContext extends AbstractContext implements Context, S
      * @var Sasl
      */
     protected $authenticationFactory;
+
+    protected $mechanisms = array();
+    protected $channelBindings = array();
 
     /**
      * Initializes context.
@@ -73,9 +86,17 @@ abstract class AbstractXMPPContext extends AbstractContext implements Context, S
      * @param string  $username Domain name of server (important for connecting)
      * @param string  $password
      * @param string  $logdir
+     * @param string  $tlsversion
      */
-    public function __construct($hostname, $port, $domain, $username, $password, $logdir)
-    {
+    public function __construct(
+        $hostname,
+        $port,
+        $domain,
+        $username,
+        $password,
+        $logdir,
+        $tlsversion = 'tlsv1.2'
+    ) {
         $this->hostname = $hostname;
         $this->port     = (int) $port;
         $this->domain   = $domain;
@@ -88,5 +109,19 @@ abstract class AbstractXMPPContext extends AbstractContext implements Context, S
 
         $this->authenticationFactory = new Sasl;
         $this->logdir = $logdir;
+
+        $this->tlsversion = $tlsversion;
+    }
+
+    protected function getOptions()
+    {
+        return new Options(
+            $this->username,
+            $this->password,
+            null,
+            'xmpp',
+            $this->domain,
+            new DowngradeProtectionOptions($this->mechanisms, $this->channelBindings)
+        );
     }
 }
