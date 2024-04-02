@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Psalm
         uses: docker://vimeo/psalm-github-actions
@@ -18,7 +18,7 @@ jobs:
           composer_ignore_platform_reqs: true
 
       - name: Upload Security Analysis results to GitHub
-        uses: github/codeql-action/upload-sarif@v2
+        uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: results.sarif
 
@@ -39,7 +39,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Behat
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Install PHP
       uses: shivammathur/setup-php@v2
@@ -48,7 +48,7 @@ jobs:
 
     - name: Cache Composer packages
       id: composer-cache
-      uses: actions/cache@v2
+      uses: actions/cache@v4
       with:
         path: vendor
         key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
@@ -133,7 +133,7 @@ jobs:
     name: Unit Tests - PHP ${{ matrix.php.version }} ${{ matrix.prefer-lowest }}
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Install PHP
       uses: shivammathur/setup-php@v2
@@ -146,7 +146,7 @@ jobs:
 
     - name: Cache Composer packages
       id: composer-cache
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: vendor
         key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
