@@ -1,12 +1,13 @@
 version: '3'
 services:
   xmpp:
-    image: ejabberd/ecs:${EJABBERD_VERSION:-23.10}
+    image: ejabberd/ecs:${EJABBERD_VERSION:-24.02}
     volumes:
       - "./tests/config/ejabberd/ejabberd.yml:/home/ejabberd/conf/ejabberd.yml"
       - "./tests/config/ejabberd/ejabberd.db:/home/ejabberd/database/ejabberd.db"
     ports:
-      - "15222:5222"
+      - "5222:5222"
+      - "5223:5223"
     environment:
       - CTL_ON_CREATE=register testuser localhost testpass
 
@@ -17,4 +18,4 @@ services:
       - "./tests/config/dovecot/users:/etc/dovecot/users"
       - "./tests/config/dovecot/auth-passwdfile.conf.ext:/etc/dovecot/auth-passwdfile.conf.ext"
     ports:
-      - "11110:110"
+      - "1110:110"

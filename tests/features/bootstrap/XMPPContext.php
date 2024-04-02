@@ -39,6 +39,8 @@ namespace Fabiang\Sasl\Behat;
 
 use PHPUnit\Framework\Assert;
 use Fabiang\Sasl\Options;
+use Fabiang\Sasl\Options\DowngradeProtectionOptions;
+use Behat\Behat\Tester\Exception\PendingException;
 
 /**
  * Defines application features from the specific context.
@@ -54,7 +56,7 @@ class XMPPContext extends AbstractXMPPContext
     {
         $this->authenticationObject = $this->authenticationFactory->factory(
             'scram-sha-1',
-            new Options($this->username, $this->password)
+            $this->getOptions()
         );
 
         $authData = base64_encode($this->authenticationObject->createResponse());
@@ -70,7 +72,7 @@ class XMPPContext extends AbstractXMPPContext
     {
         $this->authenticationObject = $this->authenticationFactory->factory(
             'scram-sha-256',
-            new Options($this->username, $this->password)
+            $this->getOptions()
         );
 
         $authData = base64_encode($this->authenticationObject->createResponse());
@@ -86,12 +88,22 @@ class XMPPContext extends AbstractXMPPContext
     {
         $this->authenticationObject = $this->authenticationFactory->factory(
             'scram-sha-512',
-            new Options($this->username, $this->password)
+            $this->getOptions()
         );
 
         $authData = base64_encode($this->authenticationObject->createResponse());
         $this->write(
             "<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='SCRAM-SHA-512'>$authData</auth>"
+        );
+    }
+
+    private function sendStreamStart()
+    {
+        $this->write(
+            '<?xml version="1.0" encoding="UTF-8"?><stream:stream'
+            . ' from="'. $this->username . '@' . $this->domain . '"'
+            . ' to="' . $this->domain
+            . '" xmlns:stream="http://etherx.jabber.org/streams" xmlns="jabber:client" version="1.0">'
         );
     }
 
@@ -101,11 +113,45 @@ class XMPPContext extends AbstractXMPPContext
     public function connectionToXmppServer()
     {
         $this->connect();
+        $this->sendStreamStart();
+    }
 
-        $this->write(
-            '<?xml version="1.0" encoding="UTF-8"?><stream:stream to="' . $this->domain
-            . '" xmlns:stream="http://etherx.jabber.org/streams" xmlns="jabber:client" version="1.0">'
-        );
+    /**
+     * @Given Connection is encrypted by STARTTLS
+     */
+    public function connectionIsEncryptedByStarttls()
+    {
+        $this->write("<starttls xmlns='urn:ietf:params:xml:ns:xmpp-tls'/>");
+        $data = $this->readStreamUntil(array(
+            "<proceed xmlns='urn:ietf:params:xml:ns:xmpp-tls'/>",
+            "<failure xmlns='urn:ietf:params:xml:ns:xmpp-tls'/>"
+        ));
+
+        Assert::assertStringContainsString("<proceed", $data);
+
+        $cryptoMethod = null;
+        switch ($this->tlsversion) {
+            case 'ssl':
+            case 'tls':
+                $cryptoMethod = STREAM_CRYPTO_METHOD_TLS_CLIENT;
+                break;
+            case 'tlsv1.0':
+                $cryptoMethod = STREAM_CRYPTO_METHOD_TLSv1_0_CLIENT;
+                break;
+            case 'tlsv1.1':
+                $cryptoMethod = STREAM_CRYPTO_METHOD_TLSv1_1_CLIENT;
+                break;
+            case 'tlsv1.2':
+                $cryptoMethod = STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT;
+                break;
+            case 'tlsv1.3':
+                $cryptoMethod = STREAM_CRYPTO_METHOD_TLSv1_3_CLIENT; // available since PHP 7.4
+                break;
+        }
+
+        Assert::assertTrue(stream_socket_enable_crypto($this->stream, true, $cryptoMethod));
+
+        $this->sendStreamStart();
     }
 
     /**
@@ -115,6 +161,19 @@ class XMPPContext extends AbstractXMPPContext
     {
         $data = $this->readStreamUntil('</stream:features>');
         Assert::assertStringContainsString("<mechanism>$authenticationMethod</mechanism>", $data);
+
+        $mechanismsMatch = array();
+        Assert::assertTrue((bool) preg_match_all(
+            '#<mechanism>(?<mecha>[^<]+)</mechanism>#ms',
+            $data,
+            $mechanismsMatch
+        ));
+        $this->mechanisms = array_unique($mechanismsMatch['mecha']);
+
+        $channelBindingMatch = array();
+        if (preg_match_all("#<channel-binding type='(?<cb>[^']+)'#ms", $data, $channelBindingMatch)) {
+            $this->channelBindings = array_unique($channelBindingMatch['cb']);
+        }
     }
 
     /**
@@ -131,6 +190,31 @@ class XMPPContext extends AbstractXMPPContext
             '<auth xmlns="urn:ietf:params:xml:ns:xmpp-sasl" mechanism="PLAIN">'
             . base64_encode($authenticationData) . '</auth>'
         );
+    }
+
+    /**
+     * @Given Downgrade protection is properly set up
+     */
+    public function downgradeProtectionIsProperlySetUp()
+    {
+        Assert::assertNotEmpty($this->mechanisms);
+        Assert::assertNotEmpty($this->channelBindings);
+    }
+
+    /**
+     * @Given We simulate downgrade protection error by adding an auth mechanism
+     */
+    public function weSimulateDowngradeProtectionErrorByAddingAnAuthMechanism()
+    {
+        $this->mechanisms[] = 'X-AUTH-FABIANG';
+    }
+
+    /**
+     * @Given We simulate downgrade protection error by adding an unsupported channel-binding
+     */
+    public function weSimulateDowngradeProtectionErrorByAddingAnUnsupportedChannelBinding()
+    {
+        $this->channelBindings[] = 'tls-unsupported';
     }
 
     /**
@@ -152,13 +236,7 @@ class XMPPContext extends AbstractXMPPContext
             $data
         );
 
-        $authenticationObject = $this->authenticationFactory->factory('DIGEST-MD5', new Options(
-            $this->username,
-            $this->password,
-            null,
-            'xmpp',
-            $this->domain
-        ));
+        $authenticationObject = $this->authenticationFactory->factory('DIGEST-MD5', $this->getOptions());
 
         $challenge = substr($data, 52, -12);
 
@@ -198,9 +276,30 @@ class XMPPContext extends AbstractXMPPContext
 
         $authData = $this->authenticationObject->createResponse($challenge);
 
+        Assert::assertNotFalse($authData);
+
         $this->write(
             "<response xmlns='urn:ietf:params:xml:ns:xmpp-sasl'>" . base64_encode($authData) . "</response>"
         );
+    }
+
+    /**
+     * @When response to challenge for SCRAM-SHA-:hash was invalid
+     */
+    public function responseToChallengeForScramShaWasInvalid($hash)
+    {
+        $data = $this->readStreamUntil(array('</challenge>', '</failure>'));
+        Assert::assertMatchesRegularExpression(
+            "#<challenge xmlns='urn:ietf:params:xml:ns:xmpp-sasl'>[^<]+</challenge>#",
+            $data
+        );
+
+        $challenge = base64_decode(substr($data, 52, -12));
+
+        $authData = $this->authenticationObject->createResponse($challenge);
+
+        Assert::assertFalse($authData);
+        $this->write('</stream:stream>');
     }
 
     /**
@@ -235,6 +334,16 @@ class XMPPContext extends AbstractXMPPContext
         $verfication = base64_decode(substr($data, 50, -10));
 
         Assert::assertTrue($this->authenticationObject->verify($verfication));
+    }
+
+    /**
+     * @Then Server connection should be closed
+     */
+    public function serverConnectionShouldBeClosed()
+    {
+        $this->readStreamUntil('</stream:stream>');
+        stream_socket_shutdown($this->stream, STREAM_SHUT_RDWR);
+        $this->stream = null;
     }
 
     /**

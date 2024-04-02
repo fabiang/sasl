@@ -38,6 +38,7 @@
 namespace Fabiang\Sasl;
 
 use Fabiang\Sasl\Exception\InvalidArgumentException;
+use Fabiang\Sasl\Options\DowngradeProtectionOptions;
 
 /**
  * Client implementation of various SASL mechanisms
@@ -65,10 +66,10 @@ class Sasl
      * type.
      *
      * @param string $type  One of: Anonymous
-     *                             Plain
-     *                             CramMD5
-     *                             DigestMD5
-     *                             SCRAM-* (any mechanism of the SCRAM family)
+     *                              Plain
+     *                              CramMD5
+     *                              DigestMD5
+     *                              SCRAM-* (any mechanism of the SCRAM family)
      *                      Types are not case sensitive
      * @param Options|array Options for authentication
      * @return \Fabiang\Sasl\Authentication\AuthenticationInterface
@@ -97,7 +98,6 @@ class Sasl
     }
 
     /**
-     *
      * @param Options|array $options
      * @return \Fabiang\Sasl\Options
      * @throws InvalidArgumentException
@@ -107,12 +107,24 @@ class Sasl
         $optionsObject = $options;
 
         if (is_array($options)) {
+            $downgradeProtectOptions = null;
+            if (isset($options['downgrade_protection'])) {
+                $dpo = $options['downgrade_protection'];
+
+                $allowedMechanisms = isset($dpo['allowed_mechanisms']) ? $dpo['allowed_mechanisms'] : array();
+                $allowedChannelBindings = isset($dpo['allowed_channel_bindings']) ?
+                    $dpo['allowed_channel_bindings'] : array();
+
+                $downgradeProtectOptions = new DowngradeProtectionOptions($allowedMechanisms, $allowedChannelBindings);
+            }
+
             $optionsObject = new Options(
                 $this->checkEmpty($options, 'authcid'),
                 $this->checkEmpty($options, 'secret'),
                 $this->checkEmpty($options, 'authzid'),
                 $this->checkEmpty($options, 'service'),
-                $this->checkEmpty($options, 'hostname')
+                $this->checkEmpty($options, 'hostname'),
+                $downgradeProtectOptions
             );
         }
 
@@ -128,7 +140,6 @@ class Sasl
     }
 
     /**
-     *
      * @param array  $array
      * @param string $key
      * @return mixed

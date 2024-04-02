@@ -3,6 +3,7 @@
 .gitattributes export-ignore
 .scrutinizer.yml export-ignore
 .github/ export-ignore
+.envrc export-ignore
 /tests export-ignore
 /Vagrantfile export-ignore
 phpunit.xml.dist export-ignore

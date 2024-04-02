@@ -50,12 +50,6 @@ use Fabiang\Sasl\Options;
  */
 class POP3Context extends AbstractContext implements Context, SnippetAcceptingContext
 {
-
-    protected $hostname;
-    protected $port;
-    protected $username;
-    protected $password;
-
     /**
      * @var \Fabiang\Sasl\Authentication\AuthenticationInterface
      */

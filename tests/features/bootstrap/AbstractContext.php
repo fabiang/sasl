@@ -47,6 +47,11 @@ use Behat\Behat\Hook\Scope\BeforeScenarioScope;
  */
 abstract class AbstractContext
 {
+    protected $hostname;
+    protected $port;
+    protected $username;
+    protected $password;
+
     protected $stream;
     protected $logdir;
     protected $logfile;
@@ -58,7 +63,14 @@ abstract class AbstractContext
 
         $connectionString = "tcp://{$this->hostname}:{$this->port}";
 
-        $this->stream = stream_socket_client($connectionString, $errno, $errstr, 5);
+        $context = stream_context_create(array(
+            'ssl' => array(
+                'verify_peer'       => false,
+                'allow_self_signed' => true,
+            ),
+        ));
+
+        $this->stream = stream_socket_client($connectionString, $errno, $errstr, 5, STREAM_CLIENT_CONNECT, $context);
 
         Assert::assertNotFalse($this->stream, "Coudn't connection to host {$this->hostname}");
     }

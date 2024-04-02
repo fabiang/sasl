@@ -162,24 +162,34 @@ class SCRAM extends AbstractAuthentication implements ChallengeAuthenticationInt
     {
         $matches = array();
 
-        $serverMessageRegexp = "#^r=([\x21-\x2B\x2D-\x7E/]+)"
-            . ",s=((?:[A-Za-z0-9/+]{4})*(?:[A-Za-z0-9/+]{3}=|[A-Za-z0-9/+]{2}==)?)"
-            . ",i=([0-9]*)(,[A-Za-z]=[^,])*$#";
+        $serverMessageRegexp = "#^r=(?<nonce>[\x21-\x2B\x2D-\x7E/]+)"
+            . ",s=(?<salt>(?:[A-Za-z0-9/+]{4})*(?:[A-Za-z0-9/+]{3}=|[A-Za-z0-9/+]{2}==)?)"
+            . ",i=(?<iteration>[0-9]*)"
+            . "(?:,d=(?<downgradeProtection>(?:[A-Za-z0-9/+]{4})*(?:[A-Za-z0-9/+]{3}=|[A-Za-z0-9/+]{2}==)))?"
+            . "(,[A-Za-z]=[^,])*$#";
+
         if (!isset($this->cnonce, $this->gs2Header) || !preg_match($serverMessageRegexp, $challenge, $matches)) {
             return false;
         }
-        $nonce = $matches[1];
-        $salt  = base64_decode($matches[2]);
+
+        $nonce = $matches['nonce'];
+        $salt  = base64_decode($matches['salt']);
         if (!$salt) {
             // Invalid Base64.
             return false;
         }
-        $i = intval($matches[3]);
+        $i = intval($matches['iteration']);
 
         $cnonce = substr($nonce, 0, strlen($this->cnonce));
         if ($cnonce !== $this->cnonce) {
             // Invalid challenge! Are we under attack?
             return false;
+        }
+
+        if (!empty($matches['downgradeProtection'])) {
+            if (!$this->downgradeProtection($matches['downgradeProtection'])) {
+                return false;
+            }
         }
 
         $channelBinding       = 'c=' . base64_encode($this->gs2Header);
@@ -195,6 +205,20 @@ class SCRAM extends AbstractAuthentication implements ChallengeAuthenticationInt
         $proof                = ',p=' . base64_encode($clientProof);
 
         return $finalMessage . $proof;
+    }
+
+    /**
+     * @param string $expectedDowngradeProtectionHash
+     * @return bool
+     */
+    private function downgradeProtection($expectedDowngradeProtectionHash)
+    {
+        if ($this->options->getDowngradeProtection() === null) {
+            return true;
+        }
+
+        $actualDgPHash = base64_encode(call_user_func($this->hash, $this->generateDowngradeProtectionVerification()));
+        return $expectedDowngradeProtectionHash === $actualDgPHash;
     }
 
     /**

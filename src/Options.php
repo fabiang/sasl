@@ -37,6 +37,8 @@
 
 namespace Fabiang\Sasl;
 
+use Fabiang\Sasl\Options\DowngradeProtectionOptions;
+
 /**
  * Options object for Sasl.
  *
@@ -80,6 +82,11 @@ class Options
     protected $hostname;
 
     /**
+     * @var DowngradeProtectionOptions|null
+     */
+    protected $downgradeProtection;
+
+    /**
      * Constructor.
      *
      * @param string $authcid  authentication identity (e.g. username)
@@ -87,14 +94,22 @@ class Options
      * @param string $authzid  authorization identity (username to proxy as)
      * @param string $service  service name
      * @param string $hostname service hostname
+     * @param DowngradeProtectionOptions $downgradeProtection Options for SCRAM-SHA*'s downgrade protection
      */
-    public function __construct($authcid, $secret = null, $authzid = null, $service = null, $hostname = null)
-    {
-        $this->authcid  = $authcid;
-        $this->secret   = $secret;
-        $this->authzid  = $authzid;
-        $this->service  = $service;
-        $this->hostname = $hostname;
+    public function __construct(
+        $authcid,
+        $secret = null,
+        $authzid = null,
+        $service = null,
+        $hostname = null,
+        DowngradeProtectionOptions $downgradeProtection = null
+    ) {
+        $this->authcid             = $authcid;
+        $this->secret              = $secret;
+        $this->authzid             = $authzid;
+        $this->service             = $service;
+        $this->hostname            = $hostname;
+        $this->downgradeProtection = $downgradeProtection;
     }
 
     public function getAuthcid()
@@ -120,5 +135,13 @@ class Options
     public function getHostname()
     {
         return $this->hostname;
+    }
+
+    /**
+     * @return DowngradeProtectionOptions|null
+     */
+    public function getDowngradeProtection()
+    {
+        return $this->downgradeProtection;
     }
 }

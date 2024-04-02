@@ -78,12 +78,17 @@ class SaslTest extends TestCase
     public function testFactory($expectedInstance, $mechanism, $hashAlgo = null)
     {
         $object = $this->object->factory($mechanism, array(
-            'authcid'  => 'testuser',
-            'hostname' => 'hostname',
-            'service'  => 'servicename',
-            'secret'   => 'mysecret',
-            'authzid'  => 'authzid'
+            'authcid'              => 'testuser',
+            'hostname'             => 'hostname',
+            'service'              => 'servicename',
+            'secret'               => 'mysecret',
+            'authzid'              => 'authzid',
+            'downgrade_protection' => array(
+                'allowed_mechanisms'       => array('X-TEST'),
+                'allowed_channel_bindings' => array('tls-unique'),
+            ),
         ));
+
         $this->assertInstanceOf($expectedInstance, $object);
         $this->assertInstanceOf('Fabiang\Sasl\Options', $object->getOptions());
         $this->assertSame('testuser', $object->getOptions()->getAuthcid());
@@ -91,6 +96,13 @@ class SaslTest extends TestCase
         $this->assertSame('authzid', $object->getOptions()->getAuthzid());
         $this->assertSame('servicename', $object->getOptions()->getService());
         $this->assertSame('hostname', $object->getOptions()->getHostname());
+
+        $this->assertSame(array('X-TEST'), $object->getOptions()
+            ->getDowngradeProtection()
+            ->getAllowedMechanisms());
+        $this->assertSame(array('tls-unique'), $object->getOptions()
+            ->getDowngradeProtection()
+            ->getAllowedChannelBindings());
 
         if (null !== $hashAlgo) {
             $this->assertInstanceOf('Fabiang\Sasl\Authentication\SCRAM', $object);

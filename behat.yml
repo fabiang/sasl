@@ -5,14 +5,15 @@ default:
       contexts:
         - Fabiang\Sasl\Behat\XMPPContext:
           - localhost
-          - 15222
+          - 5222
           - localhost
           - testuser
           - testpass
           - "%paths.base%/tests/log/features/"
+          - tlsv1.2
         - Fabiang\Sasl\Behat\POP3Context:
           - localhost
-          - 11110
+          - 1110
           - vmail
           - pass
           - "%paths.base%/tests/log/features/"
