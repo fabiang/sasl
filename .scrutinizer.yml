@@ -21,9 +21,7 @@ tools:
   php_analyzer: true
   sensiolabs_security_checker: true
   php_changetracking: true
-  external_code_coverage:
-    runs: 2
-    timeout: 120
+  external_code_coverage: false
 
 build:
   environment:
