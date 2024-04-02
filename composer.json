@@ -44,7 +44,7 @@
         "phpunit/phpunit": ">=4.8",
         "slevomat/coding-standard": "*",
         "squizlabs/php_codesniffer": "*",
-        "vimeo/psalm": "^4.0"
+        "vimeo/psalm": "^5.23"
     },
     "config": {
         "sort-packages": true,
