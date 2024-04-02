@@ -6,8 +6,7 @@ The PHP SASL Authentification Library.
 [![Latest Stable Version](https://poser.pugx.org/fabiang/sasl/v/stable.svg)](https://packagist.org/packages/fabiang/sasl)
 [![Total Downloads](https://poser.pugx.org/fabiang/sasl/downloads.svg)](https://packagist.org/packages/fabiang/sasl)
 [![License](https://poser.pugx.org/fabiang/sasl/license.svg)](https://packagist.org/packages/fabiang/sasl)
-[![Unit Tests](https://github.com/fabiang/sasl/actions/workflows/unit.yml/badge.svg?branch=develop)](https://github.com/fabiang/sasl/actions/workflows/unit.yml)
-[![Integration Tests](https://github.com/fabiang/sasl/actions/workflows/behat.yml/badge.svg?branch=develop)](https://github.com/fabiang/sasl/actions/workflows/behat.yml)
+[![CI](https://github.com/fabiang/sasl/actions/workflows/ci.yml/badge.svg?branch=develop)](https://github.com/fabiang/sasl/actions/workflows/ci.yml)  
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/fabiang/sasl/badges/quality-score.png?b=develop)](https://scrutinizer-ci.com/g/fabiang/sasl/?branch=develop)
 [![Code Coverage](https://scrutinizer-ci.com/g/fabiang/sasl/badges/coverage.png?b=develop)](https://scrutinizer-ci.com/g/fabiang/sasl/?branch=develop)
 
