@@ -6,7 +6,7 @@ The PHP SASL Authentification Library.
 [![Latest Stable Version](https://poser.pugx.org/fabiang/sasl/v/stable.svg)](https://packagist.org/packages/fabiang/sasl)
 [![Total Downloads](https://poser.pugx.org/fabiang/sasl/downloads.svg)](https://packagist.org/packages/fabiang/sasl)
 [![License](https://poser.pugx.org/fabiang/sasl/license.svg)](https://packagist.org/packages/fabiang/sasl)
-[![CI](https://github.com/fabiang/sasl/actions/workflows/ci.yml/badge.svg?branch=develop)](https://github.com/fabiang/sasl/actions/workflows/ci.yml)  
+[![CI](https://github.com/fabiang/sasl/actions/workflows/ci.yml/badge.svg?branch=develop)](https://github.com/fabiang/sasl/actions/workflows/ci.yml)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/fabiang/sasl/badges/quality-score.png?b=develop)](https://scrutinizer-ci.com/g/fabiang/sasl/?branch=develop)
 [![Code Coverage](https://scrutinizer-ci.com/g/fabiang/sasl/badges/coverage.png?b=develop)](https://scrutinizer-ci.com/g/fabiang/sasl/?branch=develop)
 
@@ -74,6 +74,8 @@ If the method returns false you should disconnect.
 To enable [downgrade protection for SCRAM](https://xmpp.org/extensions/xep-0474.html), you'll need to pass
 the allowed authentication mechanisms and channel-binding types via options to the factory:
 
+**Note**: Channel-binding is currently not supported due to limitations of PHP.
+
 ```php
 $mechanism = $factory->factory('SCRAM-SHA-1', array(
     'authcid'  => 'username',
@@ -119,8 +121,6 @@ Run the unit tests:
 
 The integration tests verify the authentication methods against an Ejabberd and Dovecot server.
 
-### Docker Compose
-
 To launch the servers you can use the provided Docker Compose file.
 Just [install Docker](https://www.docker.com/get-started/) and run:
 
@@ -129,8 +129,6 @@ docker compose up -d
 ```
 
 **Note:** ejabberd takes up to *twenty minutes* to start.
-
-### RUN
 
 Now you can run the integration tests:
 
