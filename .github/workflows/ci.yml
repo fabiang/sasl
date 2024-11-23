@@ -128,6 +128,9 @@ jobs:
         - version: 8.3
           phpunit: 10.0
           coverage: false
+        - version: 8.4
+          phpunit: 11.0
+          coverage: false
         prefer-lowest: ['', '--prefer-lowest']
 
     name: Unit Tests - PHP ${{ matrix.php.version }} ${{ matrix.prefer-lowest }}
