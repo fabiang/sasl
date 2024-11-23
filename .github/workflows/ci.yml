@@ -59,7 +59,7 @@ jobs:
       run: composer install --prefer-dist --no-progress
 
     - name: Run containers
-      run: docker-compose up -d --quiet-pull
+      run: docker compose up -d --quiet-pull
 
     - name: Wait for XMPP to become available
       uses: iFaxity/wait-on-action@v1
@@ -75,7 +75,7 @@ jobs:
 
     - name: Stop containers
       if: always()
-      run: docker-compose down --volumes
+      run: docker compose down --volumes
 
   unittest:
     runs-on: ubuntu-latest
@@ -127,6 +127,9 @@ jobs:
           coverage: true
         - version: 8.3
           phpunit: 10.0
+          coverage: false
+        - version: 8.4
+          phpunit: 11.0
           coverage: false
         prefer-lowest: ['', '--prefer-lowest']
 
