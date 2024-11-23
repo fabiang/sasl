@@ -2,7 +2,7 @@
 
 The PHP SASL Authentification Library.
 
-[![PHP Version Require](http://poser.pugx.org/fabiang/sasl/require/php)](https://packagist.org/packages/fabiang/sasl)
+[![PHP Version Require](https://poser.pugx.org/fabiang/sasl/require/php)](https://packagist.org/packages/fabiang/sasl)
 [![Latest Stable Version](https://poser.pugx.org/fabiang/sasl/v/stable.svg)](https://packagist.org/packages/fabiang/sasl)
 [![Total Downloads](https://poser.pugx.org/fabiang/sasl/downloads.svg)](https://packagist.org/packages/fabiang/sasl)
 [![License](https://poser.pugx.org/fabiang/sasl/license.svg)](https://packagist.org/packages/fabiang/sasl)
@@ -74,7 +74,7 @@ If the method returns false you should disconnect.
 To enable [downgrade protection for SCRAM](https://xmpp.org/extensions/xep-0474.html), you'll need to pass
 the allowed authentication mechanisms and channel-binding types via options to the factory:
 
-**Note**: Channel-binding is currently not supported due to limitations of PHP.
+**Note**: Channel-binding is currently not supported [due to limitations of PHP](https://github.com/php/php-src/issues/16766).
 
 ```php
 $mechanism = $factory->factory('SCRAM-SHA-1', array(
