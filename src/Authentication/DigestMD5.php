@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Sasl library.
  *
  * Copyright (c) 2002-2003 Richard Heyes,
- *               2014-2024 Fabian Grutschus
+ *               2014-2025 Fabian Grutschus
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,10 +37,12 @@
  * @author Richard Heyes <richard@php.net>
  */
 
-namespace Fabiang\Sasl\Authentication;
+namespace Fabiang\SASL\Authentication;
 
-use Fabiang\Sasl\Exception\InvalidArgumentException;
-use Fabiang\Sasl\Exception\RuntimeException;
+use Fabiang\SASL\Exception\InvalidArgumentException;
+use Fabiang\SASL\Exception\RuntimeException;
+use Deprecated;
+use Override;
 
 /**
  * Implmentation of DIGEST-MD5 SASL mechanism
@@ -53,19 +57,27 @@ class DigestMD5 extends AbstractAuthentication implements ChallengeAuthenticatio
      * mechanisms, which are unavoidable.
      *
      * @param  string $challenge The digest challenge sent by the server
-     * @return string            The digest response (NOT base64 encoded)
+     * @return string|false      The digest response (NOT base64 encoded)
      */
-    public function createResponse($challenge = null)
+    #[Deprecated(message: "DigestMD5 authentication mechanism is insecure", since: "2.0")]
+    #[Override]
+    public function createResponse(?string $challenge = null): string|false
     {
         $parsedChallenge = $this->parseChallenge($challenge);
         $authzidString = '';
 
         $authcid  = $this->options->getAuthcid();
-        $pass     = $this->options->getSecret();
-        $authzid  = $this->options->getAuthzid();
+        $secret   = $this->options->getSecret();
         $service  = $this->options->getService();
         $hostname = $this->options->getHostname();
-        if (!empty($authzid)) {
+
+        if ($authcid === null || $secret === null || $service === null || $hostname === null
+            || $authcid === '' || $secret === '' || $service === '' || $hostname === '') {
+            return false;
+        }
+
+        $authzid  = $this->options->getAuthzid();
+        if ($authzid !== null && $authzid !== '') {
             $authzidString = 'authzid="' . $authzid . '",';
         }
 
@@ -74,7 +86,7 @@ class DigestMD5 extends AbstractAuthentication implements ChallengeAuthenticatio
             $digestUri      = sprintf('%s/%s', $service, $hostname);
             $responseValue = $this->getResponseValue(
                 $authcid,
-                $pass,
+                $secret,
                 $parsedChallenge['realm'],
                 $parsedChallenge['nonce'],
                 $cnonce,
@@ -107,22 +119,25 @@ class DigestMD5 extends AbstractAuthentication implements ChallengeAuthenticatio
     /**
      * Parses and verifies the digest challenge*
      *
-     * @param  string $challenge The digest challenge
+     * @param  string|null $challenge The digest challenge
      * @return array             The parsed challenge as an assoc
      *                           array in the form "directive => value".
-     * @access private
      */
-    private function parseChallenge($challenge)
+    private function parseChallenge(?string $challenge): array
     {
+        if ($challenge === null || $challenge === '') {
+            return [];
+        }
+
         /**
          * Defaults and required directives
          */
-        $tokens  = array(
+        $tokens  = [
             'realm'  => '',
             'maxbuf' => 65536,
-        );
+        ];
 
-        $matches = array();
+        $matches = [];
         while (preg_match('/^(?<key>[a-z-]+)=(?<value>"[^"]+(?<!\\\)"|[^,]+)/i', $challenge, $matches)) {
             $match = $matches[0];
             $key   = $matches['key'];
@@ -136,7 +151,7 @@ class DigestMD5 extends AbstractAuthentication implements ChallengeAuthenticatio
 
         // Required: nonce, algorithm
         if (empty($tokens['nonce']) || empty($tokens['algorithm'])) {
-            return array();
+            return [];
         }
 
         return $tokens;
@@ -144,12 +159,8 @@ class DigestMD5 extends AbstractAuthentication implements ChallengeAuthenticatio
 
     /**
      * Check found token.
-     *
-     * @param array  $tokens
-     * @param string $key
-     * @param string $value
      */
-    private function checkToken(array &$tokens, $key, $value)
+    private function checkToken(array &$tokens, string $key, string $value): void
     {
         // Ignore these as per rfc2831
         if ($key !== 'opaque' && $key !== 'domain') {
@@ -166,7 +177,7 @@ class DigestMD5 extends AbstractAuthentication implements ChallengeAuthenticatio
 
                     // Any other multiple instance = failure
                 } else {
-                    return array();
+                    return;
                 }
             } else {
                 $tokens[$key] = $this->trim($value);
@@ -174,12 +185,7 @@ class DigestMD5 extends AbstractAuthentication implements ChallengeAuthenticatio
         }
     }
 
-    /**
-     *
-     * @param string $string
-     * @return string
-     */
-    private function trim($string)
+    private function trim(string $string): string
     {
         return trim($string, '"');
     }
@@ -188,28 +194,32 @@ class DigestMD5 extends AbstractAuthentication implements ChallengeAuthenticatio
      * Creates the response= part of the digest response
      *
      * @param  string $authcid    Authentication id (username)
-     * @param  string $pass       Password
+     * @param  string $secret     Secret/Password
      * @param  string $realm      Realm as provided by the server
      * @param  string $nonce      Nonce as provided by the server
      * @param  string $cnonce     Client nonce
      * @param  string $digest_uri The digest-uri= value part of the response
      * @param  string $authzid    Authorization id
      * @return string             The response= part of the digest response
-     * @access private
      */
-    private function getResponseValue($authcid, $pass, $realm, $nonce, $cnonce, $digest_uri, $authzid = '')
-    {
-        if ($authzid == '') {
-            $A1 = sprintf('%s:%s:%s', pack('H32', md5(sprintf('%s:%s:%s', $authcid, $realm, $pass))), $nonce, $cnonce);
+    private function getResponseValue(
+        string $authcid,
+        #[\SensitiveParameter]
+        string $secret,
+        string $realm,
+        string $nonce,
+        string $cnonce,
+        string $digest_uri,
+        ?string $authzid = null
+    ): string {
+        $pack = pack('H32', md5(sprintf('%s:%s:%s', $authcid, $realm, $secret)));
+
+        if ($authzid === null || $authzid === '') {
+            $A1 = sprintf('%s:%s:%s', $pack, $nonce, $cnonce);
         } else {
-            $A1 = sprintf(
-                '%s:%s:%s:%s',
-                pack('H32', md5(sprintf('%s:%s:%s', $authcid, $realm, $pass))),
-                $nonce,
-                $cnonce,
-                $authzid
-            );
+            $A1 = sprintf('%s:%s:%s:%s', $pack, $nonce, $cnonce, $authzid);
         }
+
         $A2 = 'AUTHENTICATE:' . $digest_uri;
         return md5(sprintf('%s:%s:00000001:%s:auth:%s', md5($A1), $nonce, $cnonce, md5($A2)));
     }

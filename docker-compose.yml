@@ -1,7 +1,6 @@
-version: '3'
 services:
   xmpp:
-    image: ejabberd/ecs:${EJABBERD_VERSION:-24.02}
+    image: ejabberd/ecs:${EJABBERD_VERSION:-24.12}
     volumes:
       - "./tests/config/ejabberd/ejabberd.yml:/home/ejabberd/conf/ejabberd.yml"
       - "./tests/config/ejabberd/ejabberd.db:/home/ejabberd/database/ejabberd.db"
@@ -27,7 +26,7 @@ services:
       - CTL_ON_CREATE=register testuser localhost testpass
 
   mail:
-    image: dovecot/dovecot:2.3.18
+    image: dovecot/dovecot:${DOVECOT_VERSION:-2.3.18}
     volumes:
       - "./tests/config/dovecot/dovecot.conf:/etc/dovecot/dovecot.conf"
       - "./tests/config/dovecot/users:/etc/dovecot/users"

@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Sasl library.
  *
  * Copyright (c) 2002-2003 Richard Heyes,
- *               2014-2024 Fabian Grutschus
+ *               2014-2025 Fabian Grutschus
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,9 +37,9 @@
  * @author Richard Heyes <richard@php.net>
  */
 
-namespace Fabiang\Sasl\Authentication;
+namespace Fabiang\SASL\Authentication;
 
-use Fabiang\Sasl\Options;
+use Fabiang\SASL\Options;
 
 /**
  * Common functionality to SASL mechanisms
@@ -48,33 +50,19 @@ abstract class AbstractAuthentication
 {
     /**
      * Use random devices.
-     *
-     * @var bool
      */
-    public static $useDevRandom = true;
+    public static bool $useDevRandom    = true;
+    private static array $randomDevices = ['/dev/urandom', '/dev/random'];
 
-    /**
-     * Options object.
-     *
-     * @var Options
-     */
-    protected $options;
-
-    /**
-     *
-     * @param Options $options
-     */
-    public function __construct(Options $options)
+    public function __construct(protected Options $options)
     {
         $this->options = $options;
     }
 
     /**
      * Get options object.
-     *
-     * @return Options
      */
-    public function getOptions()
+    public function getOptions(): Options
     {
         return $this->options;
     }
@@ -84,11 +72,14 @@ abstract class AbstractAuthentication
      *
      * @return string The cnonce value
      */
-    protected function generateCnonce()
+    protected function generateCnonce(): string
     {
-        foreach (array('/dev/urandom', '/dev/random') as $file) {
+        foreach (self::$randomDevices as $file) {
             if (true === static::$useDevRandom && is_readable($file)) {
-                return base64_encode(file_get_contents($file, false, null, 0, 32));
+                $rand = file_get_contents($file, false, null, 0, 32);
+                if ($rand !== false) {
+                    return base64_encode($rand);
+                }
             }
         }
 
@@ -102,14 +93,13 @@ abstract class AbstractAuthentication
 
     /**
      * Generate downgrade protection string
-     *
-     * @param string $groupDelimiter
-     * @param string $delimiter
-     * @return string
      */
-    protected function generateDowngradeProtectionVerification($groupDelimiter, $delimiter)
+    protected function generateDowngradeProtectionVerification(string $groupDelimiter, string $delimiter): string
     {
         $downgradeProtectionOptions = $this->options->getDowngradeProtection();
+        if ($downgradeProtectionOptions === null) {
+            return '';
+        }
 
         $allowedMechanisms      = $downgradeProtectionOptions->getAllowedMechanisms();
         $allowedChannelBindings = $downgradeProtectionOptions->getAllowedChannelBindings();
@@ -118,23 +108,20 @@ abstract class AbstractAuthentication
             return '';
         }
 
-        usort($allowedMechanisms, array($this, 'sortOctetCollation'));
-        usort($allowedChannelBindings, array($this, 'sortOctetCollation'));
+        usort($allowedMechanisms, $this->sortOctetCollation(...));
+        usort($allowedChannelBindings, $this->sortOctetCollation(...));
 
         $protect = implode($delimiter, $allowedMechanisms);
         if (count($allowedChannelBindings) > 0) {
-            $protect .= $groupDelimiter. implode($delimiter, $allowedChannelBindings);
+            $protect .= $groupDelimiter . implode($delimiter, $allowedChannelBindings);
         }
         return $protect;
     }
 
     /**
-     * @param string $a
-     * @param string $b
-     * @return int
      * @link https://datatracker.ietf.org/doc/html/rfc4790#page-22
      */
-    private function sortOctetCollation($a, $b)
+    private function sortOctetCollation(string $a, string $b): int
     {
         if ($a == $b) {
             return 0;

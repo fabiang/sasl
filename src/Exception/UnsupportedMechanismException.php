@@ -37,26 +37,13 @@ declare(strict_types=1);
  * @author Fabian Grutschus <f.grutschus@lubyte.de>
  */
 
-namespace Fabiang\SASL\Options;
+namespace Fabiang\SASL\Exception;
 
-class DowngradeProtectionOptions
+use Fabiang\SASL\Exception\ExceptionInterface;
+
+/**
+ * @author Fabian Grutschus <f.grutschus@lubyte.de>
+ */
+class UnsupportedMechanismException extends InvalidArgumentException implements ExceptionInterface
 {
-    private array $allowedMechanisms = [];
-    private array $allowedChannelBindings = [];
-
-    public function __construct(array $allowedMechanisms, array $allowedChannelBindings)
-    {
-        $this->allowedMechanisms      = $allowedMechanisms;
-        $this->allowedChannelBindings = $allowedChannelBindings;
-    }
-
-    public function getAllowedMechanisms(): array
-    {
-        return $this->allowedMechanisms;
-    }
-
-    public function getAllowedChannelBindings(): array
-    {
-        return $this->allowedChannelBindings;
-    }
 }

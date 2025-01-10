@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Sasl library.
  *
  * Copyright (c) 2002-2003 Richard Heyes,
- *               2014-2024 Fabian Grutschus
+ *               2014-2025 Fabian Grutschus
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,9 +37,11 @@
  * @author Richard Heyes <richard@php.net>
  */
 
-namespace Fabiang\Sasl\Authentication;
+namespace Fabiang\SASL\Authentication;
 
-use Fabiang\Sasl\Authentication\AbstractAuthentication;
+use Fabiang\SASL\Authentication\AbstractAuthentication;
+use Deprecated;
+use Override;
 
 /**
  * Implmentation of CRAM-MD5 SASL mechanism
@@ -51,14 +55,24 @@ class CramMD5 extends AbstractAuthentication implements ChallengeAuthenticationI
      * This DOES NOT base64 encode the return value,
      * you will need to do that yourself.
      *
-     * @param string $challenge The challenge supplied by the server.
+     * @param string|null $challenge The challenge supplied by the server.
      *                          this should be already base64_decoded.
      *
-     * @return string The string to pass back to the server, of the form
+     * @return string|false The string to pass back to the server, of the form
      *                "<user> <digest>". This is NOT base64_encoded.
      */
-    public function createResponse($challenge = null)
+    #[Deprecated(message: "CramMD5 authentication mechanism is insecure", since: "2.0")]
+    #[Override]
+    public function createResponse(?string $challenge = null): string|false
     {
-        return $this->options->getAuthcid() . ' ' . hash_hmac('md5', $challenge, $this->options->getSecret());
+        $authcid = $this->options->getAuthcid();
+        $secret  = $this->options->getSecret();
+
+        if ($authcid === null || $secret === null || $challenge === null
+            || $authcid === '' || $secret === '' || $challenge === '') {
+            return false;
+        }
+
+        return $authcid . ' ' . hash_hmac('md5', $challenge, $secret);
     }
 }

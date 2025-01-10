@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Sasl library.
  *
  * Copyright (c) 2002-2003 Richard Heyes,
- *               2014-2024 Fabian Grutschus
+ *               2014-2025 Fabian Grutschus
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,13 +37,18 @@
  * @author Fabian Grutschus <f.grutschus@lubyte.de>
  */
 
-namespace Fabiang\Sasl\Behat;
+namespace Fabiang\SASL\Behat;
 
 use Behat\Behat\Context\Context;
 use Behat\Behat\Context\SnippetAcceptingContext;
+use Behat\Step\Given;
+use Behat\Step\When;
+use Behat\Step\Then;
 use PHPUnit\Framework\Assert;
-use Fabiang\Sasl\Sasl;
-use Fabiang\Sasl\Options;
+use Fabiang\SASL\SASL;
+use Fabiang\SASL\AuthenticationMechanism;
+use Fabiang\SASL\Options;
+use Fabiang\SASL\Authentication\AuthenticationInterface;
 
 /**
  * Defines application features from the specific context.
@@ -50,17 +57,7 @@ use Fabiang\Sasl\Options;
  */
 class POP3Context extends AbstractContext implements Context, SnippetAcceptingContext
 {
-    /**
-     * @var \Fabiang\Sasl\Authentication\AuthenticationInterface
-     */
-    protected $authenticationObject;
-
-    /**
-     * @var Sasl
-     */
-    protected $authenticationFactory;
-
-    protected $challenge;
+    protected string $challenge;
 
     /**
      * Initializes context.
@@ -69,16 +66,12 @@ class POP3Context extends AbstractContext implements Context, SnippetAcceptingCo
      * You can also pass arbitrary arguments to the
      * context constructor through behat.yml.
      *
-     * @param string  $hostname Hostname for connection
-     * @param integer $port
-     * @param string  $username
-     * @param string  $password
-     * @param string  $logdir
+     * @param string $hostname Hostname for connection
      */
-    public function __construct($hostname, $port, $username, $password, $logdir)
+    public function __construct(string $hostname, string $port, string $username, string $password, string $logdir)
     {
         $this->hostname = $hostname;
-        $this->port     = (int) $port;
+        $this->port1     = (int) $port;
         $this->username = $username;
         $this->password = $password;
 
@@ -86,23 +79,18 @@ class POP3Context extends AbstractContext implements Context, SnippetAcceptingCo
             mkdir($logdir, 0777, true);
         }
 
-        $this->authenticationFactory = new Sasl;
         $this->logdir = $logdir;
     }
 
-    /**
-     * @Given Connection to pop3 server
-     */
-    public function connectionToPopServer()
+    #[Given('Connection to pop3 server')]
+    public function connectionToPopServer(): void
     {
-        $this->connect($this->port);
+        $this->connect($this->port1);
         Assert::assertSame("+OK Dovecot ready.\r\n", $this->read());
     }
 
-    /**
-     * @Given challenge received at auth request method :mechanism
-     */
-    public function challengeReceivedAtAuthRequestMethod($mechanism)
+    #[Given('challenge received at auth request method :mechanism')]
+    public function challengeReceivedAtAuthRequestMethod(string $mechanism): void
     {
         $this->write("AUTH $mechanism\r\n");
         $challenge = $this->read();
@@ -110,23 +98,16 @@ class POP3Context extends AbstractContext implements Context, SnippetAcceptingCo
         $this->challenge = base64_decode(substr(trim($challenge), 2));
     }
 
-    /**
-     * @When Autenticate with CRAM-MD5
-     */
-    public function autenticateWithCramMd5()
+    #[When('Autenticate with CRAM-MD5')]
+    public function autenticateWithCramMd5(): void
     {
-        $authenticationObject = $this->authenticationFactory->factory(
-            'CRAM-MD5',
-            new Options($this->username, $this->password)
-        );
-        $response = base64_encode($authenticationObject->createResponse($this->challenge));
+        $mechanism = SASL::CramMD5->mechanism(new Options($this->username, $this->password));
+        $response = base64_encode($mechanism->createResponse($this->challenge));
         $this->write("$response\r\n");
     }
 
-    /**
-     * @Then should be authenticate at pop3 server
-     */
-    public function shouldBeAuthenticateAtPopServer()
+    #[Then('should be authenticate at pop3 server')]
+    public function shouldBeAuthenticateAtPopServer(): void
     {
         Assert::assertSame("+OK Logged in.\r\n", $this->read());
     }

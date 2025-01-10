@@ -5,7 +5,9 @@ phpunit.xml
 .phpunit.result.cache
 .phpunit.cache/
 .phpcs-cache
+.phpunit.cache/
 *.log
+*.orig
 codeclimate.json
 ocular.phar
 ocular.phar*

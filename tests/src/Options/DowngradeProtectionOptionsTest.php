@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Sasl library.
  *
  * Copyright (c) 2002-2003 Richard Heyes,
- *               2014-2024 Fabian Grutschus
+ *               2014-2025 Fabian Grutschus
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,23 +37,21 @@
  * @author Fabian Grutschus <f.grutschus@lubyte.de>
  */
 
-namespace Fabiang\Sasl\Options;
+namespace Fabiang\SASL\Options;
 
-use Fabiang\Sasl\TestCase;
+use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\UsesClass;
 
-/**
- * @coversDefaultClass Fabiang\Sasl\Options\DowngradeProtectionOptions
- */
+#[CoversClass(DowngradeProtectionOptions::class)]
 final class DowngradeProtectionOptionsTest extends TestCase
 {
-    /**
-     * @var DowngradeProtectionOptions
-     */
-    private $options;
+    private DowngradeProtectionOptions $options;
 
     protected function setUp(): void
     {
-        $this->options = new DowngradeProtectionOptions(array('A'), array('B'));
+        $this->options = new DowngradeProtectionOptions(['A'], ['B']);
     }
 
     /**
@@ -59,9 +59,10 @@ final class DowngradeProtectionOptionsTest extends TestCase
      * @covers ::getAllowedMechanisms
      * @covers ::getAllowedChannelBindings
      */
-    public function testGetters()
+    #[Test]
+    public function getters(): void
     {
-        $this->assertSame(array('A'), $this->options->getAllowedMechanisms());
-        $this->assertSame(array('B'), $this->options->getAllowedChannelBindings());
+        $this->assertSame(['A'], $this->options->getAllowedMechanisms());
+        $this->assertSame(['B'], $this->options->getAllowedChannelBindings());
     }
 }

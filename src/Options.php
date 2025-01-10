@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Sasl library.
  *
  * Copyright (c) 2002-2003 Richard Heyes,
- *               2014-2024 Fabian Grutschus
+ *               2014-2025 Fabian Grutschus
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,9 +37,9 @@
  * @author Fabian Grutschus <f.grutschus@lubyte.de>
  */
 
-namespace Fabiang\Sasl;
+namespace Fabiang\SASL;
 
-use Fabiang\Sasl\Options\DowngradeProtectionOptions;
+use Fabiang\SASL\Options\DowngradeProtectionOptions;
 
 /**
  * Options object for Sasl.
@@ -46,46 +48,6 @@ use Fabiang\Sasl\Options\DowngradeProtectionOptions;
  */
 class Options
 {
-    /**
-     * Authentication identity (e.g. username).
-     *
-     * @var string
-     */
-    protected $authcid;
-
-    /**
-     * Authentication secret   (e.g. password)
-     *
-     * @var string
-     */
-    protected $secret;
-
-    /**
-     * Authorization identity
-     *
-     * @var string
-     */
-    protected $authzid;
-
-    /**
-     * Service name.
-     *
-     * @var string
-     */
-    protected $service;
-
-    /**
-     * Service hostname.
-     *
-     * @var string
-     */
-    protected $hostname;
-
-    /**
-     * @var DowngradeProtectionOptions|null
-     */
-    protected $downgradeProtection;
-
     /**
      * Constructor.
      *
@@ -97,50 +59,42 @@ class Options
      * @param DowngradeProtectionOptions $downgradeProtection Options for SCRAM-SHA*'s downgrade protection
      */
     public function __construct(
-        $authcid,
-        $secret = null,
-        $authzid = null,
-        $service = null,
-        $hostname = null,
-        DowngradeProtectionOptions $downgradeProtection = null
+        protected ?string $authcid = null,
+        #[\SensitiveParameter]
+        protected ?string $secret = null,
+        protected ?string $authzid = null,
+        protected ?string $service = null,
+        protected ?string $hostname = null,
+        protected ?DowngradeProtectionOptions $downgradeProtection = null
     ) {
-        $this->authcid             = $authcid;
-        $this->secret              = $secret;
-        $this->authzid             = $authzid;
-        $this->service             = $service;
-        $this->hostname            = $hostname;
-        $this->downgradeProtection = $downgradeProtection;
     }
 
-    public function getAuthcid()
+    public function getAuthcid(): ?string
     {
         return $this->authcid;
     }
 
-    public function getSecret()
+    public function getSecret(): ?string
     {
         return $this->secret;
     }
 
-    public function getAuthzid()
+    public function getAuthzid(): ?string
     {
         return $this->authzid;
     }
 
-    public function getService()
+    public function getService(): ?string
     {
         return $this->service;
     }
 
-    public function getHostname()
+    public function getHostname(): ?string
     {
         return $this->hostname;
     }
 
-    /**
-     * @return DowngradeProtectionOptions|null
-     */
-    public function getDowngradeProtection()
+    public function getDowngradeProtection(): ?DowngradeProtectionOptions
     {
         return $this->downgradeProtection;
     }

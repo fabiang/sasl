@@ -25,26 +25,28 @@
     ],
     "autoload": {
         "psr-4": {
-            "Fabiang\\Sasl\\": "src/"
+            "Fabiang\\SASL\\": "src/"
         },
-        "files": ["src/throwable.php"]
+        "files": [
+            "src/deprecated.php",
+            "src/override.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
-            "Fabiang\\Sasl\\Behat\\": "tests/features/bootstrap",
-            "Fabiang\\Sasl\\": "tests/src"
-        },
-        "files": ["tests/compat.php"]
+            "Fabiang\\SASL\\Behat\\": "tests/features/bootstrap",
+            "Fabiang\\SASL\\": "tests/src"
+        }
     },
     "require": {
-        "php": "^5.3.3 || ^7.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0"
+        "php": "~8.2.0 || ~8.3.0 || ~8.4.0"
     },
     "require-dev": {
-        "behat/behat": "^3.6",
-        "phpunit/phpunit": ">=4.8",
+        "behat/behat": "^3.18",
+        "phpunit/phpunit": "^10.0 || ^11.5",
         "slevomat/coding-standard": "*",
         "squizlabs/php_codesniffer": "*",
-        "vimeo/psalm": "^5.23"
+        "vimeo/psalm": "^6.0"
     },
     "config": {
         "sort-packages": true,
@@ -55,7 +57,7 @@
     "scripts": {
         "phpcs": "phpcs",
         "psalm": "psalm",
-        "phpunit": "phpunit",
+        "phpunit": "phpunit --display-phpunit-deprecations --display-skipped --display-deprecations --display-errors --display-notices --display-warnings",
         "behat": "behat",
         "test": [
             "@psalm",

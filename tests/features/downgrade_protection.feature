@@ -1,8 +1,8 @@
 @xmpp @downgradeProtection
-Feature: Authentication with a xmpp server
+Feature: Authentication with a XMPP server
 
   Background:
-    Given Connection to xmpp server
+    Given Connection to XMPP server
     And Connection is encrypted by STARTTLS
 
   @scramsha1

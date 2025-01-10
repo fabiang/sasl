@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Sasl library.
  *
  * Copyright (c) 2002-2003 Richard Heyes,
- *               2014-2024 Fabian Grutschus
+ *               2014-2025 Fabian Grutschus
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,7 +37,9 @@
  * @author Richard Heyes <richard@php.net>
  */
 
-namespace Fabiang\Sasl\Authentication;
+namespace Fabiang\SASL\Authentication;
+
+use Override;
 
 /**
  * Implmentation of ANONYMOUS SASL mechanism
@@ -55,11 +59,12 @@ class Anonymous extends AbstractAuthentication implements AuthenticationInterfac
      *
      * We could have some logic here for the second option, but this
      * would by no means create something interpretable.
-     * @param string $challenge
+     *
      * @return string The unaltered input token
      */
-    public function createResponse($challenge = null)
+    #[Override]
+    public function createResponse(?string $challenge = null): string|false
     {
-        return $this->options->getAuthcid();
+        return $this->options->getAuthcid() ?? '';
     }
 }

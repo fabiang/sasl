@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Sasl library.
  *
  * Copyright (c) 2002-2003 Richard Heyes,
- *               2014-2024 Fabian Grutschus
+ *               2014-2025 Fabian Grutschus
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,7 +37,9 @@
  * @author Richard Heyes <richard@php.net>
  */
 
-namespace Fabiang\Sasl\Authentication;
+namespace Fabiang\SASL\Authentication;
+
+use Override;
 
 /**
  * Implmentation of PLAIN SASL mechanism
@@ -46,12 +50,14 @@ class Plain extends AbstractAuthentication implements AuthenticationInterface
 {
     /**
      * Returns PLAIN response
-
+     *
      * @return string PLAIN Response
      */
-    public function createResponse($challenge = null)
+    #[Override]
+    public function createResponse(?string $challenge = null): string|false
     {
-        return $this->options->getAuthzid() . chr(0)
-            . $this->options->getAuthcid() . chr(0) . $this->options->getSecret();
+        return ($this->options->getAuthzid() ?? '') . chr(0)
+            . ($this->options->getAuthcid() ?? '') . chr(0)
+            . ($this->options->getSecret() ?? '');
     }
 }

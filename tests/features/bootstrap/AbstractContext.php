@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Sasl library.
  *
  * Copyright (c) 2002-2003 Richard Heyes,
- *               2014-2024 Fabian Grutschus
+ *               2014-2025 Fabian Grutschus
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,9 +37,11 @@
  * @author Fabian Grutschus <f.grutschus@lubyte.de>
  */
 
-namespace Fabiang\Sasl\Behat;
+namespace Fabiang\SASL\Behat;
 
 use PHPUnit\Framework\Assert;
+use Behat\Hook\BeforeScenario;
+use Behat\Hook\AfterScenario;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 
 /**
@@ -47,28 +51,29 @@ use Behat\Behat\Hook\Scope\BeforeScenarioScope;
  */
 abstract class AbstractContext
 {
-    protected $hostname;
-    protected $port;
-    protected $username;
-    protected $password;
+    protected string $hostname;
+    protected int $port1;
+    protected int $port2;
+    protected string $username;
+    protected string $password;
 
+    protected string $logdir;
     protected $stream;
-    protected $logdir;
     protected $logfile;
 
-    protected function connect($port)
+    protected function connect(int $port): void
     {
         $errno  = null;
         $errstr = null;
 
         $connectionString = "tcp://{$this->hostname}:{$port}";
 
-        $context = stream_context_create(array(
-            'ssl' => array(
+        $context = stream_context_create([
+            'ssl' => [
                 'verify_peer'       => false,
                 'allow_self_signed' => true,
-            ),
-        ));
+            ],
+        ]);
 
         $this->stream = stream_socket_client($connectionString, $errno, $errstr, 5, STREAM_CLIENT_CONNECT, $context);
 
@@ -78,17 +83,14 @@ abstract class AbstractContext
     /**
      * Read stream until string is found.
      *
-     * @param string|array  $until
-     * @param integer $timeout
-     * @return string
      * @throws \Exception
      */
-    protected function readStreamUntil($until, $timeout = 5)
+    protected function readStreamUntil(string|array $until, int $timeout = 5): string
     {
         $readStart = time();
 
         if (is_string($until)) {
-            $until = array($until);
+            $until = [$until];
         }
 
         $data = '';
@@ -111,7 +113,7 @@ abstract class AbstractContext
         return $data;
     }
 
-    protected function read()
+    protected function read(): string
     {
         $data = fread($this->stream, 4096);
         if (strlen($data) > 0) {
@@ -120,16 +122,14 @@ abstract class AbstractContext
         return $data;
     }
 
-    protected function write($data)
+    protected function write(string $data): void
     {
         fwrite($this->logfile, 'C: ' . trim($data) . "\n");
         fwrite($this->stream, $data);
     }
 
-    /**
-     * @BeforeScenario
-     */
-    public function openLog(BeforeScenarioScope $scope)
+    #[BeforeScenario()]
+    public function openLog(BeforeScenarioScope $scope): void
     {
         $featureTags  = $scope->getFeature()->getTags();
         $mechanism    = array_shift($featureTags);
@@ -148,10 +148,8 @@ abstract class AbstractContext
         );
     }
 
-    /**
-     * @AfterScenario
-     */
-    public function closeConnection()
+    #[AfterScenario()]
+    public function closeConnection(): void
     {
         if ($this->stream) {
             fclose($this->stream);
