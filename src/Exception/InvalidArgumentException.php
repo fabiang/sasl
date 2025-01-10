@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Sasl library.
  *
  * Copyright (c) 2002-2003 Richard Heyes,
- *               2014-2024 Fabian Grutschus
+ *               2014-2025 Fabian Grutschus
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,15 +37,16 @@
  * @author Fabian Grutschus <f.grutschus@lubyte.de>
  */
 
-namespace Fabiang\Sasl\Exception;
+namespace Fabiang\SASL\Exception;
 
-use Fabiang\Sasl\Exception\ExceptionInterface;
+use InvalidArgumentException as BaseInvalidArgumentException;
+use Fabiang\SASL\Exception\ExceptionInterface;
 
 /**
  * InvalidArgumentException
  *
  * @author Fabian Grutschus <f.grutschus@lubyte.de>
  */
-class InvalidArgumentException extends \InvalidArgumentException implements ExceptionInterface
+class InvalidArgumentException extends BaseInvalidArgumentException implements ExceptionInterface
 {
 }

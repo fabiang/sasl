@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Sasl library.
  *
  * Copyright (c) 2002-2003 Richard Heyes,
- *               2014-2024 Fabian Grutschus
+ *               2014-2025 Fabian Grutschus
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,11 +37,12 @@
  * @author Jehan <jehan.marmottard@gmail.com>
  */
 
-namespace Fabiang\Sasl\Authentication;
+namespace Fabiang\SASL\Authentication;
 
-use Fabiang\Sasl\Authentication\AbstractAuthentication;
-use Fabiang\Sasl\Options;
-use Fabiang\Sasl\Exception\InvalidArgumentException;
+use Fabiang\SASL\Authentication\AbstractAuthentication;
+use Fabiang\SASL\Options;
+use Fabiang\SASL\Exception\InvalidArgumentException;
+use SensitiveParameterValue;
 
 /**
  * Implementation of SCRAM-* SASL mechanisms.
@@ -51,14 +54,13 @@ use Fabiang\Sasl\Exception\InvalidArgumentException;
  */
 class SCRAM extends AbstractAuthentication implements ChallengeAuthenticationInterface, VerificationInterface
 {
-    private $hashAlgo;
-    private $hash;
-    private $hmac;
-    private $gs2Header;
-    private $cnonce;
-    private $firstMessageBare;
-    private $saltedPassword;
-    private $authMessage;
+    private string $hashAlgo;
+
+    private ?string $gs2Header = null;
+    private ?string $cnonce = null;
+    private ?string $firstMessageBare = null;
+    private ?SensitiveParameterValue $saltedSecret = null;
+    private ?string $authMessage = null;
 
     /**
      * Construct a SCRAM-H client where 'H' is a cryptographic hash function.
@@ -70,26 +72,22 @@ class SCRAM extends AbstractAuthentication implements ChallengeAuthenticationInt
      * Names" registry.
      * @throws InvalidArgumentException
      */
-    public function __construct(Options $options, $hash)
+    public function __construct(Options $options, string $hash)
     {
         parent::__construct($options);
 
         // Though I could be strict, I will actually also accept the naming used in the PHP core hash framework.
         // For instance "sha1" is accepted, while the registered hash name should be "SHA-1".
-        $normalizedHash = strtolower(preg_replace('#^sha-(\d+)#i', 'sha\1', $hash));
+        $replaced = preg_replace('#^sha-(\d+)#i', 'sha\1', $hash);
+        if ($replaced === null) {
+            throw new InvalidArgumentException("Could not normalize hash '$hash'");
+        }
+        $normalizedHash = strtolower($replaced);
 
         $hashAlgos = hash_algos();
         if (!in_array($normalizedHash, $hashAlgos)) {
             throw new InvalidArgumentException("Invalid SASL mechanism type '$hash'");
         }
-
-        $this->hash = function ($data) use ($normalizedHash) {
-            return hash($normalizedHash, $data, true);
-        };
-
-        $this->hmac = function ($key, $str, $raw) use ($normalizedHash) {
-            return hash_hmac($normalizedHash, $str, $key, $raw);
-        };
 
         $this->hashAlgo = $normalizedHash;
     }
@@ -101,22 +99,29 @@ class SCRAM extends AbstractAuthentication implements ChallengeAuthenticationInt
      * If the challenge is null or an empty string, the result will be the "initial response".
      * @return string|false      The response (binary, NOT base64 encoded)
      */
-    public function createResponse($challenge = null)
+    public function createResponse(?string $challenge = null): string|false
     {
-        $authcid = $this->formatName($this->options->getAuthcid());
-        if (empty($authcid)) {
+        $authcid = $this->options->getAuthcid();
+        if ($authcid === null || $authcid === '') {
+            return false;
+        }
+
+        $authcid = $this->formatName($authcid);
+
+        $secret = $this->options->getSecret();
+        if ($secret === null || $secret === '') {
             return false;
         }
 
         $authzid = $this->options->getAuthzid();
-        if (!empty($authzid)) {
+        if ($authzid !== null && $authzid !== '') {
             $authzid = $this->formatName($authzid);
         }
 
-        if (empty($challenge)) {
+        if ($challenge === null) {
             return $this->generateInitialResponse($authcid, $authzid);
         } else {
-            return $this->generateResponse($challenge, $this->options->getSecret());
+            return $this->generateResponse($challenge, $secret);
         }
     }
 
@@ -126,9 +131,9 @@ class SCRAM extends AbstractAuthentication implements ChallengeAuthenticationInt
      * @param string $username a name to be prepared.
      * @return string the reformated name.
      */
-    private function formatName($username)
+    private function formatName(string $username): string
     {
-        return str_replace(array('=', ','), array('=3D', '=2C'), $username);
+        return str_replace(['=', ','], ['=3D', '=2C'], $username);
     }
 
     /**
@@ -139,10 +144,15 @@ class SCRAM extends AbstractAuthentication implements ChallengeAuthenticationInt
      * @param string $authzid Prepared authorization identity.
      * @return string The SCRAM response to send.
      */
-    private function generateInitialResponse($authcid, $authzid)
+    private function generateInitialResponse(string $authcid, ?string $authzid): string
     {
-        $gs2CbindFlag   = 'n,';
-        $this->gs2Header = $gs2CbindFlag . (!empty($authzid) ? 'a=' . $authzid : '') . ',';
+        $gs2Header = 'n,';
+        if ($authzid !== null && $authzid !== '') {
+            $gs2Header .= 'a=' . $authzid;
+        }
+        $gs2Header .= ',';
+
+        $this->gs2Header = $gs2Header;
 
         // I must generate a client nonce and "save" it for later comparison on second response.
         $this->cnonce = $this->generateCnonce();
@@ -154,13 +164,17 @@ class SCRAM extends AbstractAuthentication implements ChallengeAuthenticationInt
     /**
      * Parses and verifies a non-empty SCRAM challenge.
      *
-     * @param  string $challenge The SCRAM challenge
-     * @return string|false      The response to send; false in case of wrong challenge or if an initial response has
+     * @param  string       $challenge The SCRAM challenge
+     * @return string|false $secret The response to send; false in case of wrong challenge or if an initial response has
      * not been generated first.
      */
-    private function generateResponse($challenge, $password)
-    {
-        $matches = array();
+    private function generateResponse(
+        string $challenge,
+        #[\SensitiveParameter]
+        string $secret
+    ): string|false {
+        /* @psalm-var array<int,string> $matches */
+        $matches = [];
 
         $serverMessageRegexp = "#^r=(?<nonce>[\x21-\x2B\x2D-\x7E/]+)"
             . ",s=(?<salt>(?:[A-Za-z0-9/+]{4})*(?:[A-Za-z0-9/+]{3}=|[A-Za-z0-9/+]{2}==)?)"
@@ -168,7 +182,10 @@ class SCRAM extends AbstractAuthentication implements ChallengeAuthenticationInt
             . "(?:,d=(?<downgradeProtection>(?:[A-Za-z0-9/+]{4})*(?:[A-Za-z0-9/+]{3}=|[A-Za-z0-9/+]{2}==)))?"
             . "(,[A-Za-z]=[^,])*$#";
 
-        if (!isset($this->cnonce, $this->gs2Header) || !preg_match($serverMessageRegexp, $challenge, $matches)) {
+        if ($this->cnonce === null ||
+            $this->gs2Header === null ||
+            $this->firstMessageBare === null ||
+            !preg_match($serverMessageRegexp, $challenge, $matches)) {
             return false;
         }
 
@@ -186,7 +203,7 @@ class SCRAM extends AbstractAuthentication implements ChallengeAuthenticationInt
             return false;
         }
 
-        if (!empty($matches['downgradeProtection'])) {
+        if ($matches['downgradeProtection'] !== '') {
             if (!$this->downgradeProtection($matches['downgradeProtection'])) {
                 return false;
             }
@@ -194,30 +211,26 @@ class SCRAM extends AbstractAuthentication implements ChallengeAuthenticationInt
 
         $channelBinding       = 'c=' . base64_encode($this->gs2Header);
         $finalMessage         = $channelBinding . ',r=' . $nonce;
-        $saltedPassword       = $this->hi($password, $salt, $i);
-        $this->saltedPassword = $saltedPassword;
-        $clientKey            = call_user_func($this->hmac, $saltedPassword, "Client Key", true);
-        $storedKey            = call_user_func($this->hash, $clientKey, true);
+        $saltedSecret         = $this->hi($secret, $salt, $i);
+        $this->saltedSecret   = new SensitiveParameterValue($saltedSecret);
+        $clientKey            = $this->hmac($saltedSecret, "Client Key", true);
+        $storedKey            = $this->hash($clientKey);
         $authMessage          = $this->firstMessageBare . ',' . $challenge . ',' . $finalMessage;
         $this->authMessage    = $authMessage;
-        $clientSignature      = call_user_func($this->hmac, $storedKey, $authMessage, true);
+        $clientSignature      = $this->hmac($storedKey, $authMessage, true);
         $clientProof          = $clientKey ^ $clientSignature;
         $proof                = ',p=' . base64_encode($clientProof);
 
         return $finalMessage . $proof;
     }
 
-    /**
-     * @param string $expectedDowngradeProtectionHash
-     * @return bool
-     */
-    private function downgradeProtection($expectedDowngradeProtectionHash)
+    private function downgradeProtection(string $expectedDowngradeProtectionHash): bool
     {
         if ($this->options->getDowngradeProtection() === null) {
             return true;
         }
 
-        $actualDgPHash = base64_encode(call_user_func($this->hash, $this->generateDowngradeProtectionVerification()));
+        $actualDgPHash = base64_encode($this->hash($this->generateDowngradeProtectionVerification()));
         return $expectedDowngradeProtectionHash === $actualDgPHash;
     }
 
@@ -228,13 +241,17 @@ class SCRAM extends AbstractAuthentication implements ChallengeAuthenticationInt
      * @param string $salt The salt value.
      * @param int $i The   iteration count.
      */
-    private function hi($str, $salt, $i)
-    {
+    private function hi(
+        #[\SensitiveParameter]
+        string $str,
+        string $salt,
+        int $i
+    ): string {
         $int1   = "\0\0\0\1";
-        $ui     = call_user_func($this->hmac, $str, $salt . $int1, true);
+        $ui     = $this->hmac($str, $salt . $int1, true);
         $result = $ui;
         for ($k = 1; $k < $i; $k++) {
-            $ui     = call_user_func($this->hmac, $str, $ui, true);
+            $ui     = $this->hmac($str, $ui, true);
             $result = $result ^ $ui;
         }
         return $result;
@@ -249,43 +266,58 @@ class SCRAM extends AbstractAuthentication implements ChallengeAuthenticationInt
      * @return bool Whether the server has been authenticated.
      * If false, the client must close the connection and consider to be under a MITM attack.
      */
-    public function verify($data)
+    public function verify(string $data): bool
     {
-        $verifierRegexp = '#^v=((?:[A-Za-z0-9/+]{4})*(?:[A-Za-z0-9/+]{3}=|[A-Za-z0-9/+]{2}==)?)$#';
+        $verifierRegexp = '#^v=(?<verifier>(?:[A-Za-z0-9/+]{4})*(?:[A-Za-z0-9/+]{3}=|[A-Za-z0-9/+]{2}==)?)$#';
 
-        $matches = array();
-        if (!isset($this->saltedPassword, $this->authMessage) || !preg_match($verifierRegexp, $data, $matches)) {
+        $matches = [];
+        if (empty($this->saltedSecret) ||
+            $this->authMessage === null ||
+            !preg_match($verifierRegexp, $data, $matches)) {
             // This cannot be an outcome, you never sent the challenge's response.
             return false;
         }
 
-        $verifier                = $matches[1];
+        $saltedSecret = $this->saltedSecret->getValue();
+
+        $verifier                = $matches['verifier'];
         $proposedServerSignature = base64_decode($verifier);
-        $serverKey               = call_user_func($this->hmac, $this->saltedPassword, "Server Key", true);
-        $serverSignature         = call_user_func($this->hmac, $serverKey, $this->authMessage, true);
+        $serverKey               = $this->hmac($saltedSecret, "Server Key", true);
+        $serverSignature         = $this->hmac($serverKey, $this->authMessage, true);
 
         return $proposedServerSignature === $serverSignature;
     }
 
-    /**
-     * @return string
-     */
-    public function getCnonce()
+    private function hash(string $data): string
+    {
+        return hash($this->hashAlgo, $data, true);
+    }
+
+    private function hmac(string $key, string $str, bool $raw): string
+    {
+        return hash_hmac($this->hashAlgo, $str, $key, $raw);
+    }
+
+    public function getCnonce(): ?string
     {
         return $this->cnonce;
     }
 
-    public function getSaltedPassword()
+    public function getSaltedSecret(): ?string
     {
-        return $this->saltedPassword;
+        if ($this->saltedSecret === null) {
+            return null;
+        }
+
+        return $this->saltedSecret->getValue();
     }
 
-    public function getAuthMessage()
+    public function getAuthMessage(): ?string
     {
         return $this->authMessage;
     }
 
-    public function getHashAlgo()
+    public function getHashAlgo(): string
     {
         return $this->hashAlgo;
     }

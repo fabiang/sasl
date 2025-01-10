@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Sasl library.
  *
  * Copyright (c) 2002-2003 Richard Heyes,
- *               2014-2024 Fabian Grutschus
+ *               2014-2025 Fabian Grutschus
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,7 +37,7 @@
  * @author Jehan <jehan.marmottard@gmail.com>
  */
 
-namespace Fabiang\Sasl\Authentication;
+namespace Fabiang\SASL\Authentication;
 
 /**
  *
@@ -45,8 +47,6 @@ interface VerificationInterface
 {
     /**
      * Varify connection.
-     *
-     * @param string $data
      */
-    public function verify($data);
+    public function verify(string $data): bool;
 }

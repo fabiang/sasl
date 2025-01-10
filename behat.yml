@@ -3,15 +3,24 @@ default:
     authentication_features:
       paths: [ "%paths.base%/tests/features/" ]
       contexts:
-        - Fabiang\Sasl\Behat\XMPPContext:
+        - Fabiang\SASL\Behat\XMPPContext:
           - localhost
-          - 5222
+          - 15222
           - localhost
           - testuser
           - testpass
           - "%paths.base%/tests/log/features/"
           - tlsv1.2
-        - Fabiang\Sasl\Behat\POP3Context:
+        # Extra test server for https://dyn.eightysoft.de/xeps/xep-0474.html
+#        - Fabiang\SASL\Behat\XMPPContext:
+#          - localhost
+#          - 25222
+#          - localhost
+#          - testuser
+#          - testpass
+#          - "%paths.base%/tests/log/features/"
+#          - tlsv1.3
+        - Fabiang\SASL\Behat\POP3Context:
           - localhost
           - 1110
           - vmail

@@ -4,6 +4,7 @@ build/
 phpunit.xml
 .phpunit.result.cache
 .phpcs-cache
+.phpunit.cache/
 *.log
 codeclimate.json
 ocular.phar

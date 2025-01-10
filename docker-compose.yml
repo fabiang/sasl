@@ -1,18 +1,32 @@
-version: '3'
 services:
   xmpp:
-    image: ejabberd/ecs:${EJABBERD_VERSION:-24.02}
+    image: ejabberd/ecs:${EJABBERD_VERSION:-24.12}
     volumes:
       - "./tests/config/ejabberd/ejabberd.yml:/home/ejabberd/conf/ejabberd.yml"
       - "./tests/config/ejabberd/ejabberd.db:/home/ejabberd/database/ejabberd.db"
     ports:
-      - "5222:5222"
-      - "5223:5223"
+      - "15222:5222"
+      - "15223:5223"
     environment:
       - CTL_ON_CREATE=register testuser localhost testpass
 
+  # Extra test server for https://dyn.eightysoft.de/xeps/xep-0474.html
+#  xmpp_source:
+#    build:
+#      context: https://github.com/processone/docker-ejabberd.git#master:ecs
+#      args:
+#        - VERSION=133d52d04023d603283a7796c46bc40ffc7cd3c2
+#    volumes:
+#      - "./tests/config/ejabberd/ejabberd.yml:/home/ejabberd/conf/ejabberd.yml"
+#      - "./tests/config/ejabberd/ejabberd.db:/home/ejabberd/database/ejabberd.db"
+#    ports:
+#      - "25222:5222"
+#      - "25223:5223"
+#    environment:
+#      - CTL_ON_CREATE=register testuser localhost testpass
+
   mail:
-    image: dovecot/dovecot:2.3.18
+    image: dovecot/dovecot:${DOVECOT_VERSION:-2.3.18}
     volumes:
       - "./tests/config/dovecot/dovecot.conf:/etc/dovecot/dovecot.conf"
       - "./tests/config/dovecot/users:/etc/dovecot/users"

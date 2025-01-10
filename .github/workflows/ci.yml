@@ -61,14 +61,23 @@ jobs:
     - name: Run containers
       run: docker compose up -d --quiet-pull
 
-    - name: Wait for XMPP to become available
+    - name: Wait for first XMPP to become available
       uses: iFaxity/wait-on-action@v1
       with:
-        resource: tcp:localhost:5222
+        resource: tcp:localhost:15222
         timeout: 1800000
         interval: 10000
         delay: 60000
         log: true
+
+#    - name: Wait for second XMPP to become available
+#      uses: iFaxity/wait-on-action@v1
+#      with:
+#        resource: tcp:localhost:25222
+#        timeout: 1800000
+#        interval: 10000
+#        delay: 60000
+#        log: true
 
     - name: Run test suite
       run: ./vendor/bin/behat
@@ -83,53 +92,11 @@ jobs:
     strategy:
       matrix:
         php:
-        - version: 5.3
-          phpunit: 4.8
-          compat: true
-          coverage: false
-        - version: 5.4
-          phpunit: 4.8
-          compat: true
-          coverage: false
-        - version: 5.5
-          phpunit: 4.8
-          compat: true
-          coverage: false
-        - version: 5.6
-          phpunit: 5.7
-          compat: true
-          coverage: false
-        - version: 7.0
-          phpunit: 6.5
-          compat: true
-          coverage: false
-        - version: 7.1
-          phpunit: 7.5
-          compat: true
-          coverage: false
-        - version: 7.2
-          phpunit: 8.5
-          coverage: false
-        - version: 7.3
-          phpunit: 9.5
-          coverage: false
-        - version: 7.4
-          phpunit: 9.5
-          coverage: false
-        - version: 8.0
-          phpunit: 9.5
-          coverage: false
-        - version: 8.1
-          phpunit: 9.5
-          coverage: false
         - version: 8.2
-          phpunit: 10.0
           coverage: true
         - version: 8.3
-          phpunit: 10.0
           coverage: false
         - version: 8.4
-          phpunit: 11.0
           coverage: false
         prefer-lowest: ['', '--prefer-lowest']
 
@@ -164,8 +131,8 @@ jobs:
     - name: Update dependencies
       run: composer update --prefer-dist --no-progress --with-all-dependencies ${{ matrix.prefer-lowest }}
 
-    - name: Require compatible PHPUnit version
-      run: composer require --dev --with-all-dependencies "phpunit/phpunit:^${{ matrix.php.phpunit }}"
+    #- name: Require compatible PHPUnit version
+    #  run: composer require --dev --with-all-dependencies "phpunit/phpunit:^${{ matrix.php.phpunit }}"
 
     - name: Make Unit tests compatible
       if: ${{ matrix.php.compat }}
@@ -176,6 +143,11 @@ jobs:
       run: |
         ./vendor/bin/phpunit \
           --no-configuration \
+          --display-skipped \
+          --display-deprecations \
+          --display-errors \
+          --display-notices \
+          --display-warnings \
           tests/src/
 
     - name: Run test suite with code coverage
@@ -183,6 +155,11 @@ jobs:
       run: |
         ./vendor/bin/phpunit \
           --no-configuration \
+          --display-skipped \
+          --display-deprecations \
+          --display-errors \
+          --display-notices \
+          --display-warnings \
           --coverage-clover build/logs/clover.xml \
           --coverage-filter src/ \
           tests/src/

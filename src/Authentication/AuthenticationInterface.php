@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Sasl library.
  *
  * Copyright (c) 2002-2003 Richard Heyes,
- *               2014-2024 Fabian Grutschus
+ *               2014-2025 Fabian Grutschus
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,7 +37,7 @@
  * @author Fabian Grutschus <f.grutschus@lubyte.de>
  */
 
-namespace Fabiang\Sasl\Authentication;
+namespace Fabiang\SASL\Authentication;
 
 /**
  * Interface for Sasl authentication classes.
@@ -48,7 +50,6 @@ interface AuthenticationInterface
      * Create response.
      *
      * @param string $challenge Response challenge. Not every authentication method requires this value.
-     * @return string|false
      */
-    public function createResponse($challenge = null);
+    public function createResponse(?string $challenge = null): string|false;
 }
