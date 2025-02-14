@@ -165,12 +165,17 @@ class SCRAM extends AbstractAuthentication implements ChallengeAuthenticationInt
         $serverMessageRegexp = "#^r=(?<nonce>[\x21-\x2B\x2D-\x7E/]+)"
             . ",s=(?<salt>(?:[A-Za-z0-9/+]{4})*(?:[A-Za-z0-9/+]{3}=|[A-Za-z0-9/+]{2}==)?)"
             . ",i=(?<iteration>[0-9]*)"
-            . "(?:,d=(?<downgradeProtection>(?:[A-Za-z0-9/+]{4})*(?:[A-Za-z0-9/+]{3}=|[A-Za-z0-9/+]{2}==)))?"
-            . "(,[A-Za-z]=[^,])*$#";
+            . "(,(?<additionalAttributes>.*))?$#";
 
         if (!isset($this->cnonce, $this->gs2Header) || !preg_match($serverMessageRegexp, $challenge, $matches)) {
             return false;
         }
+
+        $additionalAttributes = $this->parseAdditionalAttributes($matches);
+
+        //forbidden by RFC 5802
+        if(isset($additionalAttributes['m']))
+            return false;
 
         $nonce = $matches['nonce'];
         $salt  = base64_decode($matches['salt']);
@@ -186,8 +191,9 @@ class SCRAM extends AbstractAuthentication implements ChallengeAuthenticationInt
             return false;
         }
 
-        if (!empty($matches['downgradeProtection'])) {
-            if (!$this->downgradeProtection($matches['downgradeProtection'])) {
+        //SSDP hash
+        if (!empty($additionalAttributes['d'])) {
+            if (!$this->downgradeProtection($additionalAttributes['d'])) {
                 return false;
             }
         }
@@ -241,6 +247,23 @@ class SCRAM extends AbstractAuthentication implements ChallengeAuthenticationInt
     }
 
     /**
+     * This will parse all non-fixed-position additional SCRAM attributes (the optional ones and the m-attribute)
+     * @param array $matches The array returned by our regex match, MUST contain an 'additionalAttributes' key
+     * @return array
+     */
+    private function parseAdditionalAttributes($matches)
+    {
+        $additionalAttributes=array();
+        $tail=explode(',', $matches['additionalAttributes']);
+        foreach($tail as $entry)
+        {
+            $entry=explode("=", $entry, 2);
+            $additionalAttributes[$entry[0]] = $entry[1];
+        }
+        return $additionalAttributes;
+    }
+
+    /**
      * SCRAM has also a server verification step. On a successful outcome, it will send additional data which must
      * absolutely be checked against this function. If this fails, the entity which we are communicating with is
      * probably not the server as it has not access to your ServerKey.
@@ -251,13 +274,19 @@ class SCRAM extends AbstractAuthentication implements ChallengeAuthenticationInt
      */
     public function verify($data)
     {
-        $verifierRegexp = '#^v=((?:[A-Za-z0-9/+]{4})*(?:[A-Za-z0-9/+]{3}=|[A-Za-z0-9/+]{2}==)?)$#';
+        $verifierRegexp = '#^v=((?:[A-Za-z0-9/+]{4})*(?:[A-Za-z0-9/+]{3}=|[A-Za-z0-9/+]{2}==)?)(,(?<additionalAttributes>.*))?$#';
 
         $matches = array();
         if (!isset($this->saltedPassword, $this->authMessage) || !preg_match($verifierRegexp, $data, $matches)) {
             // This cannot be an outcome, you never sent the challenge's response.
             return false;
         }
+
+        $additionalAttributes = $this->parseAdditionalAttributes($matches);
+
+        //forbidden by RFC 5802
+        if(isset($additionalAttributes['m']))
+            return false;
 
         $verifier                = $matches[1];
         $proposedServerSignature = base64_decode($verifier);
