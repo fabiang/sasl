@@ -119,9 +119,9 @@ abstract class AbstractAuthentication
         usort($allowedMechanisms, array($this, 'sortOctetCollation'));
         usort($allowedChannelBindings, array($this, 'sortOctetCollation'));
 
-        $protect = implode(',', $allowedMechanisms);
+        $protect = implode("\x1e", $allowedMechanisms);
         if (count($allowedChannelBindings) > 0) {
-            $protect .= '|' . implode(',', $allowedChannelBindings);
+            $protect .= "\x1f" . implode("\x1e", $allowedChannelBindings);
         }
         return $protect;
     }

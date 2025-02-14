@@ -192,8 +192,8 @@ class SCRAM extends AbstractAuthentication implements ChallengeAuthenticationInt
         }
 
         //SSDP hash
-        if (!empty($additionalAttributes['d'])) {
-            if (!$this->downgradeProtection($additionalAttributes['d'])) {
+        if (!empty($additionalAttributes['h'])) {
+            if (!$this->downgradeProtection($additionalAttributes['h'])) {
                 return false;
             }
         }
