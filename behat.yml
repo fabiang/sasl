@@ -5,7 +5,9 @@ default:
       contexts:
         - Fabiang\Sasl\Behat\XMPPContext:
           - localhost
-          - 5222
+          - 15222
+          # Extra test server for https://dyn.eightysoft.de/xeps/xep-0474.html
+          - 25222
           - localhost
           - testuser
           - testpass

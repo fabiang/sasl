@@ -95,7 +95,7 @@ class POP3Context extends AbstractContext implements Context, SnippetAcceptingCo
      */
     public function connectionToPopServer()
     {
-        $this->connect();
+        $this->connect($this->port);
         Assert::assertSame("+OK Dovecot ready.\r\n", $this->read());
     }
 

@@ -3,6 +3,7 @@
 build/
 phpunit.xml
 .phpunit.result.cache
+.phpunit.cache/
 .phpcs-cache
 *.log
 codeclimate.json

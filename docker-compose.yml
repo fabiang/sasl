@@ -6,8 +6,23 @@ services:
       - "./tests/config/ejabberd/ejabberd.yml:/home/ejabberd/conf/ejabberd.yml"
       - "./tests/config/ejabberd/ejabberd.db:/home/ejabberd/database/ejabberd.db"
     ports:
-      - "5222:5222"
-      - "5223:5223"
+      - "15222:5222"
+      - "15223:5223"
+    environment:
+      - CTL_ON_CREATE=register testuser localhost testpass
+
+  # Extra test server for https://dyn.eightysoft.de/xeps/xep-0474.html
+  xmpp_source:
+    build:
+      context: https://github.com/processone/docker-ejabberd.git#master:ecs
+      args:
+        - VERSION=ceee3d3be1fc1053e61bbc81881bd40dbbbc1e89
+    volumes:
+      - "./tests/config/ejabberd/ejabberd.yml:/home/ejabberd/conf/ejabberd.yml"
+      - "./tests/config/ejabberd/ejabberd.db:/home/ejabberd/database/ejabberd.db"
+    ports:
+      - "25222:5222"
+      - "25223:5223"
     environment:
       - CTL_ON_CREATE=register testuser localhost testpass
 

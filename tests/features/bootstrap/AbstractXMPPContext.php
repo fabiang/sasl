@@ -55,6 +55,9 @@ abstract class AbstractXMPPContext extends AbstractContext implements Context, S
      */
     protected $domain;
 
+    protected $port1;
+    protected $port2;
+
     /**
      * @var string
      */
@@ -81,7 +84,8 @@ abstract class AbstractXMPPContext extends AbstractContext implements Context, S
      * context constructor through behat.yml.
      *
      * @param string  $hostname Hostname for connection
-     * @param integer $port
+     * @param integer $port1
+     * @param integer $port2
      * @param string  $domain
      * @param string  $username Domain name of server (important for connecting)
      * @param string  $password
@@ -90,7 +94,8 @@ abstract class AbstractXMPPContext extends AbstractContext implements Context, S
      */
     public function __construct(
         $hostname,
-        $port,
+        $port1,
+        $port2,
         $domain,
         $username,
         $password,
@@ -98,7 +103,8 @@ abstract class AbstractXMPPContext extends AbstractContext implements Context, S
         $tlsversion = 'tlsv1.2'
     ) {
         $this->hostname = $hostname;
-        $this->port     = (int) $port;
+        $this->port1     = (int) $port1;
+        $this->port2     = (int) $port2;
         $this->domain   = $domain;
         $this->username = $username;
         $this->password = $password;

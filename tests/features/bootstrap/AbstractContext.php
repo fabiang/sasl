@@ -56,12 +56,12 @@ abstract class AbstractContext
     protected $logdir;
     protected $logfile;
 
-    protected function connect()
+    protected function connect($port)
     {
         $errno  = null;
         $errstr = null;
 
-        $connectionString = "tcp://{$this->hostname}:{$this->port}";
+        $connectionString = "tcp://{$this->hostname}:{$port}";
 
         $context = stream_context_create(array(
             'ssl' => array(

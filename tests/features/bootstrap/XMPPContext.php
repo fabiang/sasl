@@ -112,7 +112,16 @@ class XMPPContext extends AbstractXMPPContext
      */
     public function connectionToXmppServer()
     {
-        $this->connect();
+        $this->connect($this->port1);
+        $this->sendStreamStart();
+    }
+
+    /**
+     * @Given Connection to second XMPP server
+     */
+    public function connectionToSecondXmppServer(): void
+    {
+        $this->connect($this->port2);
         $this->sendStreamStart();
     }
 

@@ -103,9 +103,11 @@ abstract class AbstractAuthentication
     /**
      * Generate downgrade protection string
      *
+     * @param string $groupDelimiter
+     * @param string $delimiter
      * @return string
      */
-    protected function generateDowngradeProtectionVerification()
+    protected function generateDowngradeProtectionVerification($groupDelimiter, $delimiter)
     {
         $downgradeProtectionOptions = $this->options->getDowngradeProtection();
 
@@ -119,9 +121,9 @@ abstract class AbstractAuthentication
         usort($allowedMechanisms, array($this, 'sortOctetCollation'));
         usort($allowedChannelBindings, array($this, 'sortOctetCollation'));
 
-        $protect = implode(',', $allowedMechanisms);
+        $protect = implode($delimiter, $allowedMechanisms);
         if (count($allowedChannelBindings) > 0) {
-            $protect .= '|' . implode(',', $allowedChannelBindings);
+            $protect .= $groupDelimiter. implode($delimiter, $allowedChannelBindings);
         }
         return $protect;
     }
