@@ -70,14 +70,14 @@ jobs:
         delay: 60000
         log: true
 
-#    - name: Wait for second XMPP to become available
-#      uses: iFaxity/wait-on-action@v1
-#      with:
-#        resource: tcp:localhost:25222
-#        timeout: 1800000
-#        interval: 10000
-#        delay: 60000
-#        log: true
+    - name: Wait for second XMPP to become available
+      uses: iFaxity/wait-on-action@v1
+      with:
+        resource: tcp:localhost:25222
+        timeout: 1800000
+        interval: 10000
+        delay: 60000
+        log: true
 
     - name: Run test suite
       run: ./vendor/bin/behat

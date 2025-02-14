@@ -43,6 +43,7 @@ use PHPUnit\Framework\TestCase;
 use Fabiang\SASL\Options;
 use Fabiang\SASL\Options\DowngradeProtectionOptions;
 use Fabiang\SASL\Exception\InvalidArgumentException;
+use Fabiang\SASL\Authentication\AbstractAuthentication;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
@@ -63,10 +64,6 @@ final class SCRAMTest extends TestCase
         $this->object  = new SCRAM($this->options, 'md5');
     }
 
-    /**
-     * @param string $input
-     * @param string $expected
-     */
     #[Test]
     #[DataProvider('provideOldHashAlgos')]
     public function constructor(string $hash, string $expected): void
@@ -156,6 +153,14 @@ final class SCRAMTest extends TestCase
     }
 
     #[Test]
+    public function getInitialResponseSecretEmpty(): void
+    {
+        $options = new Options('u,=ser', '', '');
+        $object  = new SCRAM($options, 'md5');
+        $this->assertFalse($object->createResponse(null));
+    }
+
+    #[Test]
     public function getInitialResponseAuthCidIsEmpty(): void
     {
         $options = new Options('');
@@ -209,6 +214,24 @@ final class SCRAMTest extends TestCase
     }
 
     #[Test]
+    public function createResponseDowngradeProtectionSecureEnabledButInvalid(): void
+    {
+        $options = new Options(
+            'test',
+            'pass',
+            'zid',
+            null,
+            null,
+            new DowngradeProtectionOptions(['A'], ['B'])
+        );
+
+        $object = new SCRAM($options, 'md5');
+
+        $object->createResponse(null);
+        $this->assertFalse($object->createResponse('r=' . $object->getCnonce() . ',s=abcdefg=,i=2,h=invalid=,a=2'));
+    }
+
+    #[Test]
     public function createResponseDowngradeProtectionDisabled(): void
     {
         $options = new Options('test', 'pass', 'zid', null, null, null);
@@ -216,6 +239,38 @@ final class SCRAMTest extends TestCase
 
         $object->createResponse(null);
         $this->assertNotFalse($object->createResponse('r=' . $object->getCnonce() . ',s=abcdefg=,i=2,d=invalid=,a=2'));
+    }
+
+    #[Test]
+    public function createResponseDowngradeProtectionSecureDisabled(): void
+    {
+        $options = new Options('test', 'pass', 'zid', null, null, null);
+        $object  = new SCRAM($options, 'md5');
+
+        $object->createResponse(null);
+        $this->assertNotFalse($object->createResponse('r=' . $object->getCnonce() . ',s=abcdefg=,i=2,h=invalid=,a=2'));
+    }
+
+    #[Test]
+    public function createResponseExtraMAttr(): void
+    {
+        $this->object->createResponse(null);
+        $this->assertFalse(
+            $this->object->createResponse(
+                'r=' . $this->object->getCnonce() . ',s=abcdefg=,i=2,m=test,a=2'
+            )
+        );
+    }
+
+    #[Test]
+    public function createResponseEmptySalt(): void
+    {
+        $this->object->createResponse(null);
+        $this->assertFalse(
+            $this->object->createResponse(
+                'r=' . $this->object->getCnonce() . ',s=,i=2'
+            )
+        );
     }
 
     #[Test]
@@ -231,8 +286,27 @@ final class SCRAMTest extends TestCase
     }
 
     #[Test]
+    public function verifyWithExtraMAttr(): void
+    {
+        $this->object->createResponse(null);
+        $this->object->createResponse('r=' . $this->object->getCnonce() . ',s=abcdefg=,i=2,a=2');
+
+        $serverKey       = hash_hmac('md5', "Server Key", $this->object->getSaltedSecret(), true);
+        $serverSignature = hash_hmac('md5', $this->object->getAuthMessage(), $serverKey, true);
+
+        $this->assertFalse($this->object->verify('v=' . base64_encode($serverSignature) . ',m=mustfail'));
+    }
+
+    #[Test]
     public function verifyNoResponseBefore(): void
     {
         $this->assertFalse($this->object->verify(''));
+    }
+
+
+    #[Test]
+    public function saltedSecretNull(): void
+    {
+        $this->assertNull($this->object->getSaltedSecret());
     }
 }

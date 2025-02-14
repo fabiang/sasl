@@ -6,20 +6,13 @@ default:
         - Fabiang\SASL\Behat\XMPPContext:
           - localhost
           - 15222
+          # Extra test server for https://dyn.eightysoft.de/xeps/xep-0474.html
+          - 25222
           - localhost
           - testuser
           - testpass
           - "%paths.base%/tests/log/features/"
           - tlsv1.2
-        # Extra test server for https://dyn.eightysoft.de/xeps/xep-0474.html
-#        - Fabiang\SASL\Behat\XMPPContext:
-#          - localhost
-#          - 25222
-#          - localhost
-#          - testuser
-#          - testpass
-#          - "%paths.base%/tests/log/features/"
-#          - tlsv1.3
         - Fabiang\SASL\Behat\POP3Context:
           - localhost
           - 1110

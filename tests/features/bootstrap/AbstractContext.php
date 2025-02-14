@@ -52,7 +52,8 @@ use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 abstract class AbstractContext
 {
     protected string $hostname;
-    protected int $port;
+    protected int $port1;
+    protected int $port2;
     protected string $username;
     protected string $password;
 
@@ -60,12 +61,12 @@ abstract class AbstractContext
     protected $stream;
     protected $logfile;
 
-    protected function connect(): void
+    protected function connect(int $port): void
     {
         $errno  = null;
         $errstr = null;
 
-        $connectionString = "tcp://{$this->hostname}:{$this->port}";
+        $connectionString = "tcp://{$this->hostname}:{$port}";
 
         $context = stream_context_create([
             'ssl' => [

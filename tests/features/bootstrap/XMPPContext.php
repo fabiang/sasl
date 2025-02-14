@@ -72,7 +72,8 @@ class XMPPContext extends AbstractContext implements Context, SnippetAcceptingCo
      * context constructor through behat.yml.
      *
      * @param string  $hostname Hostname for connection
-     * @param integer $port
+     * @param integer $port1
+     * @param integer $port2
      * @param string  $domain
      * @param string  $username Domain name of server (important for connecting)
      * @param string  $password
@@ -81,7 +82,8 @@ class XMPPContext extends AbstractContext implements Context, SnippetAcceptingCo
      */
     public function __construct(
         string $hostname,
-        string $port,
+        string $port1,
+        string $port2,
         string $domain,
         string $username,
         string $password,
@@ -89,7 +91,8 @@ class XMPPContext extends AbstractContext implements Context, SnippetAcceptingCo
         string $tlsversion = 'tlsv1.2'
     ) {
         $this->hostname = $hostname;
-        $this->port     = (int) $port;
+        $this->port1    = (int) $port1;
+        $this->port2    = (int) $port2;
         $this->domain   = $domain;
         $this->username = $username;
         $this->password = $password;
@@ -115,10 +118,17 @@ class XMPPContext extends AbstractContext implements Context, SnippetAcceptingCo
         );
     }
 
-    #[Given('Connection to xmpp server')]
-    public function connectionToXmppServer(): void
+    #[Given('Connection to XMPP server')]
+    public function connectionToXMPPServer(): void
     {
-        $this->connect();
+        $this->connect($this->port1);
+        $this->sendStreamStart();
+    }
+
+    #[Given('Connection to second XMPP server')]
+    public function connectionToSecondXMPPServer(): void
+    {
+        $this->connect($this->port2);
         $this->sendStreamStart();
     }
 

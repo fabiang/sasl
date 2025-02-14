@@ -98,15 +98,4 @@ class Options
     {
         return $this->downgradeProtection;
     }
-
-    public function toArray(): array
-    {
-        return [
-            'authcid'  => $this->getAuthcid(),
-            'secret'   => $this->getSecret(),
-            'authzid'  => $this->getAuthzid(),
-            'service'  => $this->getService(),
-            'hostname' => $this->getHostname(),
-        ];
-    }
 }

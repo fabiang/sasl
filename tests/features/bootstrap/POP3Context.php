@@ -71,7 +71,7 @@ class POP3Context extends AbstractContext implements Context, SnippetAcceptingCo
     public function __construct(string $hostname, string $port, string $username, string $password, string $logdir)
     {
         $this->hostname = $hostname;
-        $this->port     = (int) $port;
+        $this->port1     = (int) $port;
         $this->username = $username;
         $this->password = $password;
 
@@ -85,7 +85,7 @@ class POP3Context extends AbstractContext implements Context, SnippetAcceptingCo
     #[Given('Connection to pop3 server')]
     public function connectionToPopServer(): void
     {
-        $this->connect();
+        $this->connect($this->port1);
         Assert::assertSame("+OK Dovecot ready.\r\n", $this->read());
     }
 
