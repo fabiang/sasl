@@ -26,7 +26,7 @@ services:
       - CTL_ON_CREATE=register testuser localhost testpass
 
   mail:
-    image: dovecot/dovecot:${DOVECOT_VERSION:-2.3.18}
+    image: dovecot/dovecot:${DOVECOT_VERSION:-2.4.4}
     volumes:
       - "./tests/config/dovecot/dovecot.conf:/etc/dovecot/dovecot.conf"
       - "./tests/config/dovecot/users:/etc/dovecot/users"
