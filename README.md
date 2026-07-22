@@ -121,6 +121,15 @@ again and send the returned value to the server.
 
 Authcid = e.g. username, Secret = e.g. password
 
+## Mise integration
+
+I recommend using [Mise](https://mise.jdx.dev) for local setup of a local test environment. 
+Mise let's you execute all tests under all supported PHP versions easily with:
+
+```
+mise run test
+```
+
 ## Unit tests
 
 If you like this library and you want to contribute, make sure the unit tests

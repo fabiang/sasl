@@ -251,7 +251,10 @@ class XMPPContext extends AbstractContext implements Context, SnippetAcceptingCo
     #[When('authenticate with method DIGEST-MD5')]
     public function authenticateWithMethodDigestMd5(): void
     {
-        $this->mechanism = SASL::DigestMD5->mechanism($this->getOptions());
+        $this->ignoreDeprecation(function () {
+            $this->mechanism = SASL::DigestMD5->mechanism($this->getOptions());
+        });
+
         $this->write("<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='DIGEST-MD5'/>");
     }
 
@@ -266,7 +269,9 @@ class XMPPContext extends AbstractContext implements Context, SnippetAcceptingCo
 
         $challenge = substr($data, 52, -12);
 
-        $response = $this->mechanism->createResponse(base64_decode($challenge));
+        $response = $this->ignoreDeprecation(function () use ($challenge) {
+            return $this->mechanism->createResponse(base64_decode($challenge));
+        });
 
         $this->write(
             "<response xmlns='urn:ietf:params:xml:ns:xmpp-sasl'>" . base64_encode($response) . "</response>"

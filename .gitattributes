@@ -3,7 +3,6 @@
 .gitattributes export-ignore
 .scrutinizer.yml export-ignore
 .github/ export-ignore
-.envrc export-ignore
 /tests export-ignore
 /Vagrantfile export-ignore
 phpunit.xml.dist export-ignore
@@ -12,3 +11,4 @@ composer.lock export-ignore
 docker-compose.yml export-ignore
 phpcs.xml export-ignore
 psalm.xml export-ignore
+mise.toml export-ignore

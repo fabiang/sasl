@@ -1,12 +1,12 @@
 <?php
 // @codingStandardsIgnoreFile
 // phpcs:ignore
+// phpcs:disable
 // @codeCoverageIgnoreStart
 
 declare(strict_types=1);
 
 if (!class_exists(Deprecated::class)) {
-
     #[Attribute(Attribute::TARGET_METHOD | Attribute::TARGET_FUNCTION)]
     final class Deprecated
     {
@@ -19,6 +19,5 @@ if (!class_exists(Deprecated::class)) {
             $this->since   = $since;
         }
     }
-
 }
 // @codeCoverageIgnoreEnd

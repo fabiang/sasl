@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Psalm
         uses: docker://vimeo/psalm-github-actions
@@ -18,7 +18,7 @@ jobs:
           composer_ignore_platform_reqs: true
 
       - name: Upload Security Analysis results to GitHub
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: results.sarif
 
@@ -39,7 +39,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Behat
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
 
     - name: Install PHP
       uses: shivammathur/setup-php@v2
@@ -48,7 +48,7 @@ jobs:
 
     - name: Cache Composer packages
       id: composer-cache
-      uses: actions/cache@v4
+      uses: actions/cache@v6
       with:
         path: vendor
         key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
@@ -95,18 +95,27 @@ jobs:
         - version: 8.2
           phpunit: 10.0
           coverage: true
+          ignore_platform_req: false
         - version: 8.3
           phpunit: 10.0
           coverage: false
+          ignore_platform_req: false
         - version: 8.4
           phpunit: 11.0
           coverage: false
+          ignore_platform_req: false
+        - version: 8.5
+          phpunit: 12.0
+          coverage: false
+          ignore_platform_req: false
         prefer-lowest: ['', '--prefer-lowest']
 
     name: Unit Tests - PHP ${{ matrix.php.version }} ${{ matrix.prefer-lowest }}
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
+      with:
+        fetch-depth: 10
 
     - name: Install PHP
       uses: shivammathur/setup-php@v2
@@ -119,7 +128,7 @@ jobs:
 
     - name: Cache Composer packages
       id: composer-cache
-      uses: actions/cache@v4
+      uses: actions/cache@v6
       with:
         path: vendor
         key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
@@ -131,10 +140,20 @@ jobs:
          composer remove --dev --with-all-dependencies --ignore-platform-reqs \
             squizlabs/php_codesniffer vimeo/psalm slevomat/coding-standard
 
+    - name: Update dependencies (ignore platform requirements)
+      if: matrix.php.ignore_platform_req == true
+      run: composer update --prefer-dist --no-progress --with-all-dependencies --ignore-platform-req=php ${{ matrix.prefer-lowest }}
+
     - name: Update dependencies
+      if: matrix.php.ignore_platform_req == false
       run: composer update --prefer-dist --no-progress --with-all-dependencies ${{ matrix.prefer-lowest }}
 
+    - name: Require compatible PHPUnit version (ignore platform requirements)
+      if: matrix.php.ignore_platform_req == true
+      run: composer require --dev --with-all-dependencies --ignore-platform-req=php "phpunit/phpunit:^${{ matrix.php.phpunit }}"
+
     - name: Require compatible PHPUnit version
+      if: matrix.php.ignore_platform_req == false
       run: composer require --dev --with-all-dependencies "phpunit/phpunit:^${{ matrix.php.phpunit }}"
 
     - name: Make Unit tests compatible
@@ -169,8 +188,9 @@ jobs:
       env:
         XDEBUG_MODE: coverage
 
-    - name: Run Scrutinizer
-      if: ${{ matrix.php.coverage }}
-      run: |
-        wget -q https://scrutinizer-ci.com/ocular.phar
-        php ocular.phar code-coverage:upload --format=php-clover build/logs/clover.xml || true
+    - name: Upload Scrutinizer coverage
+      uses: sudo-bot/action-scrutinizer@latest
+      # Do not run this step on forked versions of the main repository (example: contributor forks)
+      if: github.repository == 'fabiang/sasl'
+      with:
+        cli-args: "--format=php-clover build/logs/clover.xml --revision=${{ github.event.pull_request.head.sha || github.sha }}"

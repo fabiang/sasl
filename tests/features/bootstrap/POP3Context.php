@@ -101,8 +101,12 @@ class POP3Context extends AbstractContext implements Context, SnippetAcceptingCo
     #[When('Autenticate with CRAM-MD5')]
     public function autenticateWithCramMd5(): void
     {
-        $mechanism = SASL::CramMD5->mechanism(new Options($this->username, $this->password));
-        $response = base64_encode($mechanism->createResponse($this->challenge));
+        $response = $this->ignoreDeprecation(function () {
+            $mechanism = SASL::CramMD5->mechanism(new Options($this->username, $this->password));
+            $response = base64_encode($mechanism->createResponse($this->challenge));
+            return $response;
+        });
+
         $this->write("$response\r\n");
     }
 
