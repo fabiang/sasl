@@ -1,0 +1,28 @@
+[tools]
+php = "8.5"
+
+[env]
+XDEBUG_MODE = "coverage"
+EJABBERD_VERSION = "24.12"
+DOVECOT_VERSION = "2.3"
+
+[tasks.test-php-versions]
+run = """
+mise x php@8.2 -- composer update
+mise x php@8.2 -- composer run phpunit
+
+mise x php@8.3 -- composer update
+mise x php@8.3 -- composer run phpunit
+
+mise x php@8.4 -- composer update
+mise x php@8.4 -- composer run phpunit
+
+mise x php@8.5 -- composer update
+mise x php@8.5 -- composer run phpunit
+"""
+
+[tasks.test]
+run = "composer test; mise run test-php-versions"
+
+[hooks]
+enter = "echo 'Run \\`docker compose up -d\\` and then \\`composer test\\`'"

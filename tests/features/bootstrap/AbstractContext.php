@@ -159,4 +159,14 @@ abstract class AbstractContext
         fclose($this->logfile);
         $this->logfile = null;
     }
+
+    protected function ignoreDeprecation(callable $callee): string | null
+    {
+        // Disable deprecation notice
+        $previous = error_reporting();
+        error_reporting($previous & ~E_USER_DEPRECATED);
+        $return = $callee();
+        error_reporting($previous);
+        return $return;
+    }
 }
