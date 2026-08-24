@@ -96,7 +96,7 @@ $authentication = AuthenticationMechanism::SCRAM_SHA_1->mechanism([
     'authzid'  => 'authzid', // optional. Username to proxy as
     'service'  => 'servicename', // optional. Name of the service
     'hostname' => 'hostname', // optional. Hostname of the service
-    'downgrade_protection' => [ // optional. When `null` downgrade protection string from server won't be validated
+    'scram'    => [ // optional. When `null` downgrade protection string from server won't be validated
         'allowed_mechanisms'       => ['SCRAM-SHA-1-PLUS', 'SCRAM-SHA-1'], // allowed mechanisms by the server
         'allowed_channel_bindings' => ['tls-unique', 'tls-exporter', 'tls-server-end-point'], // allowed channel-binding types by the server
     ],
