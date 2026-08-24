@@ -219,7 +219,7 @@ class SCRAM extends AbstractAuthentication implements ChallengeAuthenticationInt
         $i = intval($matches['iteration']);
 
         $maxIterations = $this->getOptions()
-            ?->getSCRAMOptions()
+            ->getSCRAMOptions()
             ?->getMaxIterations() ?? static::MAX_ITERATIONS;
  
         if ($i < static::MIN_ITERATIONS) {

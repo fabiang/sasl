@@ -50,8 +50,6 @@ use Deprecated;
  */
 class Options
 {
-    protected int $scramMaxIterations;
-
     /**
      * Constructor.
      *

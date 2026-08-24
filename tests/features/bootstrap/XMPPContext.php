@@ -48,7 +48,7 @@ use Behat\Hook\AfterScenario;
 use PHPUnit\Framework\Assert;
 use Fabiang\SASL\SASL;
 use Fabiang\SASL\Options;
-use Fabiang\SASL\Options\DowngradeProtectionOptions;
+use Fabiang\SASL\Options\SCRAMOptions;
 use Fabiang\SASL\Authentication\AuthenticationInterface;
 
 /**
@@ -114,7 +114,7 @@ class XMPPContext extends AbstractContext implements Context, SnippetAcceptingCo
             null,
             'xmpp',
             $this->domain,
-            new DowngradeProtectionOptions($this->mechanisms, $this->channelBindings)
+            new SCRAMOptions($this->mechanisms, $this->channelBindings)
         );
     }
 
