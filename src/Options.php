@@ -40,6 +40,8 @@ declare(strict_types=1);
 namespace Fabiang\SASL;
 
 use Fabiang\SASL\Options\DowngradeProtectionOptions;
+use Fabiang\SASL\Options\SCRAMOptions;
+use Deprecated;
 
 /**
  * Options object for Sasl.
@@ -48,6 +50,8 @@ use Fabiang\SASL\Options\DowngradeProtectionOptions;
  */
 class Options
 {
+    protected int $scramMaxIterations;
+
     /**
      * Constructor.
      *
@@ -56,7 +60,7 @@ class Options
      * @param string $authzid  authorization identity (username to proxy as)
      * @param string $service  service name
      * @param string $hostname service hostname
-     * @param DowngradeProtectionOptions $downgradeProtection Options for SCRAM-SHA*'s downgrade protection
+     * @param SCRAMOptions $scramOptions Options for SCRAM-SHA*
      */
     public function __construct(
         protected ?string $authcid = null,
@@ -65,7 +69,7 @@ class Options
         protected ?string $authzid = null,
         protected ?string $service = null,
         protected ?string $hostname = null,
-        protected ?DowngradeProtectionOptions $downgradeProtection = null
+        protected ?SCRAMOptions $scramOptions = null
     ) {
     }
 
@@ -94,8 +98,14 @@ class Options
         return $this->hostname;
     }
 
+    #[Deprecated("'Options::getDowngradeProtection()' is depcreated, use 'Options::getSCRAMOptions()' instead.")]
     public function getDowngradeProtection(): ?DowngradeProtectionOptions
     {
-        return $this->downgradeProtection;
+        return $this->scramOptions;
+    }
+
+    public function getSCRAMOptions(): ?SCRAMOptions
+    {
+        return $this->scramOptions;
     }
 }

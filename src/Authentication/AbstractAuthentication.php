@@ -96,13 +96,13 @@ abstract class AbstractAuthentication
      */
     protected function generateDowngradeProtectionVerification(string $groupDelimiter, string $delimiter): string
     {
-        $downgradeProtectionOptions = $this->options->getDowngradeProtection();
-        if ($downgradeProtectionOptions === null) {
+        $scramOptions = $this->options->getSCRAMOptions();
+        if ($scramOptions === null) {
             return '';
         }
 
-        $allowedMechanisms      = $downgradeProtectionOptions->getAllowedMechanisms();
-        $allowedChannelBindings = $downgradeProtectionOptions->getAllowedChannelBindings();
+        $allowedMechanisms      = $scramOptions->getAllowedMechanisms();
+        $allowedChannelBindings = $scramOptions->getAllowedChannelBindings();
 
         if (count($allowedMechanisms) === 0 && count($allowedChannelBindings) === 0) {
             return '';

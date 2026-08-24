@@ -55,6 +55,18 @@ use Override;
  */
 class SCRAM extends AbstractAuthentication implements ChallengeAuthenticationInterface, VerificationInterface
 {
+     /**
+     * RFC 5802 §3.1: minimum iteration count.
+     */
+    public const MIN_ITERATIONS = 4096;
+
+    /**
+     * Maximum allowed iteration count to prevent CPU exhaustion (DoS).
+     * Legitimate servers (PostgreSQL, MongoDB, etc.) use 4096–100000.
+     * Anything above 1M is almost certainly an attack.
+     */
+    public const MAX_ITERATIONS = 1_000_000;
+
     private string $hashAlgo;
     private ?string $gs2Header = null;
     private ?string $cnonce = null;
@@ -181,7 +193,7 @@ class SCRAM extends AbstractAuthentication implements ChallengeAuthenticationInt
 
         $serverMessageRegexp = "#^r=(?<nonce>[\x21-\x2B\x2D-\x7E/]+)"
             . ",s=(?<salt>(?:[A-Za-z0-9/+]{4})*(?:[A-Za-z0-9/+]{3}=|[A-Za-z0-9/+]{2}==)?)"
-            . ",i=(?<iteration>[0-9]*)"
+            . ",i=(?<iteration>[0-9]+)"
             . "(?<additionalAttr>(?:,[A-Za-z]=[^,]+)*)$#";
 
         if ($this->cnonce === null ||
@@ -205,6 +217,18 @@ class SCRAM extends AbstractAuthentication implements ChallengeAuthenticationInt
             return false;
         }
         $i = intval($matches['iteration']);
+
+        $maxIterations = $this->getOptions()
+            ?->getSCRAMOptions()
+            ?->getMaxIterations() ?? static::MAX_ITERATIONS;
+ 
+        if ($i < static::MIN_ITERATIONS) {
+            return false;
+        }
+
+        if ($i > $maxIterations) {
+            return false;
+        }
 
         $cnonce = substr($nonce, 0, strlen($this->cnonce));
         if ($cnonce !== $this->cnonce) {
@@ -244,7 +268,7 @@ class SCRAM extends AbstractAuthentication implements ChallengeAuthenticationInt
         string $groupDelimiter,
         string $delimiter
     ): bool {
-        if ($this->options->getDowngradeProtection() === null) {
+        if ($this->options->getSCRAMOptions() === null) {
             return true;
         }
 

@@ -17,3 +17,4 @@ codeclimate-test-reporter.phar
 codeclimate-test-reporter.phar*
 composer.phar
 composer.lock
+/nbproject/

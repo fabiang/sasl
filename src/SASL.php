@@ -41,7 +41,7 @@ namespace Fabiang\SASL;
 
 use Fabiang\SASL\Exception\InvalidArgumentException;
 use Fabiang\SASL\Exception\UnsupportedMechanismException;
-use Fabiang\SASL\Options\DowngradeProtectionOptions;
+use Fabiang\SASL\Options\SCRAMOptions;
 use Fabiang\SASL\Authentication\AuthenticationInterface;
 use Fabiang\SASL\Options;
 use Fabiang\SASL\Authentication;
@@ -129,15 +129,34 @@ enum SASL: string
         if ($options instanceof Options) {
             return $options;
         }
+        
+        if (! isset($options['scram']) 
+            && isset($options['downgrade_protection'])) {
+            trigger_error(
+                sprintf(
+                    "Passing 'downgrade_protection' as options to %s:%s() "
+                        . "is deprecated, use 'scram' instead.",
+                    __CLASS__,
+                    __METHOD__
+                ),
+                E_USER_DEPRECATED
+            );
+            $options['scram'] = $options['downgrade_protection'];
+        }
 
-        $downgradeProtectOptions = null;
-        if (isset($options['downgrade_protection'])) {
-            $dpo = $options['downgrade_protection'];
+        $scramOptions = null;
+        if (isset($options['scram'])) {
+            $scro = $options['scram'];
 
-            $allowedMechanisms      = $dpo['allowed_mechanisms'] ?? [];
-            $allowedChannelBindings = $dpo['allowed_channel_bindings'] ?? [];
+            $allowedMechanisms      = $scro['allowed_mechanisms'] ?? [];
+            $allowedChannelBindings = $scro['allowed_channel_bindings'] ?? [];
+            $maxIterations = $scro['max_iterations'] ?? SCRAM::MAX_ITERATIONS;
 
-            $downgradeProtectOptions = new DowngradeProtectionOptions($allowedMechanisms, $allowedChannelBindings);
+            $scramOptions = new SCRAMOptions(
+                $allowedMechanisms, 
+                $allowedChannelBindings,
+                intval($maxIterations)
+            );
         }
 
         return new Options(
@@ -146,7 +165,7 @@ enum SASL: string
             $this->checkEmpty($options, 'authzid'),
             $this->checkEmpty($options, 'service'),
             $this->checkEmpty($options, 'hostname'),
-            $downgradeProtectOptions
+            $scramOptions
         );
     }
 

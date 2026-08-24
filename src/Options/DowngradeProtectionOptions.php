@@ -39,24 +39,13 @@ declare(strict_types=1);
 
 namespace Fabiang\SASL\Options;
 
-class DowngradeProtectionOptions
+use Deprecated;
+
+class DowngradeProtectionOptions extends SCRAMOptions
 {
-    private array $allowedMechanisms = [];
-    private array $allowedChannelBindings = [];
-
-    public function __construct(array $allowedMechanisms, array $allowedChannelBindings)
+    #[Deprecated("Class 'DowngradeProtectionOptions' is deprecated, use 'SCRAMOptions' instead.")]
+    public function __construct(array $allowedMechanisms, array $allowedChannelBindings) 
     {
-        $this->allowedMechanisms      = $allowedMechanisms;
-        $this->allowedChannelBindings = $allowedChannelBindings;
-    }
-
-    public function getAllowedMechanisms(): array
-    {
-        return $this->allowedMechanisms;
-    }
-
-    public function getAllowedChannelBindings(): array
-    {
-        return $this->allowedChannelBindings;
+        parent::__construct($allowedMechanisms, $allowedChannelBindings);
     }
 }

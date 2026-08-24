@@ -53,7 +53,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 #[CoversClass(AbstractAuthentication::class)]
 #[UsesClass(Authentication\SCRAM::class)]
 #[UsesClass(Options::class)]
-#[UsesClass(Options\DowngradeProtectionOptions::class)]
+#[UsesClass(Options\SCRAMOptions::class)]
 final class SASLTest extends TestCase
 {
     #[Test()]
@@ -96,12 +96,12 @@ final class SASLTest extends TestCase
         ?string $hashAlgo
     ): void {
         $object = $mechanism->mechanism([
-            'authcid'              => 'testuser',
-            'hostname'             => 'hostname',
-            'service'              => 'servicename',
-            'secret'               => 'mysecret',
-            'authzid'              => 'authzid',
-            'downgrade_protection' => [
+            'authcid'  => 'testuser',
+            'hostname' => 'hostname',
+            'service'  => 'servicename',
+            'secret'   => 'mysecret',
+            'authzid'  => 'authzid',
+            'scram'    => [
                 'allowed_mechanisms'       => ['X-TEST'],
                 'allowed_channel_bindings' => ['tls-unique'],
             ],
@@ -116,10 +116,10 @@ final class SASLTest extends TestCase
         $this->assertSame('hostname', $object->getOptions()->getHostname());
 
         $this->assertSame(['X-TEST'], $object->getOptions()
-            ->getDowngradeProtection()
+            ->getSCRAMOptions()
             ->getAllowedMechanisms());
         $this->assertSame(['tls-unique'], $object->getOptions()
-            ->getDowngradeProtection()
+            ->getSCRAMOptions()
             ->getAllowedChannelBindings());
 
         if (null !== $hashAlgo) {

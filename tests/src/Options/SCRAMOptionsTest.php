@@ -43,15 +43,16 @@ use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
+use Fabiang\SASL\Authentication\SCRAM;
 
-#[CoversClass(DowngradeProtectionOptions::class)]
-final class DowngradeProtectionOptionsTest extends TestCase
+#[CoversClass(SCRAMOptions::class)]
+final class SCRAMOptionsTest extends TestCase
 {
-    private DowngradeProtectionOptions $options;
+    private SCRAMOptions $options;
 
     protected function setUp(): void
     {
-        $this->options = new DowngradeProtectionOptions(['A'], ['B']);
+        $this->options = new SCRAMOptions(['A'], ['B'], SCRAM::MAX_ITERATIONS);
     }
 
     /**
@@ -64,5 +65,9 @@ final class DowngradeProtectionOptionsTest extends TestCase
     {
         $this->assertSame(['A'], $this->options->getAllowedMechanisms());
         $this->assertSame(['B'], $this->options->getAllowedChannelBindings());
+        $this->assertSame(
+            SCRAM::MAX_ITERATIONS,
+            $this->options->getMaxIterations()
+        );
     }
 }

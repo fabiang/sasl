@@ -37,43 +37,48 @@ declare(strict_types=1);
  * @author Fabian Grutschus <f.grutschus@lubyte.de>
  */
 
-namespace Fabiang\SASL;
+namespace Fabiang\SASL\Options;
 
-use PHPUnit\Framework\TestCase;
-use Fabiang\SASL\Options\SCRAMOptions;
-use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\UsesClass;
+use Fabiang\SASL\Authentication\SCRAM;
 
-#[CoversClass(Options::class)]
-#[UsesClass(SCRAMOptions::class)]
-class OptionsTest extends TestCase
+class SCRAMOptions
 {
-    protected Options $object;
-    protected SCRAMOptions $scramOptions;
+    private int $maxIterations;
 
-    protected function setUp(): void
-    {
-        $this->scramOptions = new SCRAMOptions(['A'], ['B']);
+    public function __construct(
+        private array $allowedMechanisms,
+        private array $allowedChannelBindings,
+        int $maxIterations = SCRAM::MAX_ITERATIONS
+    ) {
+        if ($maxIterations > SCRAM::MAX_ITERATIONS) {
+            trigger_error(
+                sprintf(
+                    'Maximum SCRAM iterations %d passed as option is higher '
+                        . 'than the maximum limit of %d, defaulting to %d.',
+                    $maxIterations,
+                    SCRAM::MAX_ITERATIONS,
+                    SCRAM::MAX_ITERATIONS
+                ),
+                E_USER_WARNING
+            );
+            $maxIterations = SCRAM::MAX_ITERATIONS;
+        }
 
-        $this->object = new Options(
-            'testuser',
-            'testpass',
-            'testauthzid',
-            'testservice',
-            'testhost',
-            $this->scramOptions
-        );
+        $this->maxIterations = $maxIterations;
     }
 
-    #[Test]
-    public function getter(): void
+    public function getAllowedMechanisms(): array
     {
-        $this->assertSame('testuser', $this->object->getAuthcid());
-        $this->assertSame('testpass', $this->object->getSecret());
-        $this->assertSame('testauthzid', $this->object->getAuthzid());
-        $this->assertSame('testservice', $this->object->getService());
-        $this->assertSame('testhost', $this->object->getHostname());
-        $this->assertSame($this->scramOptions, $this->object->getSCRAMOptions());
+        return $this->allowedMechanisms;
+    }
+
+    public function getAllowedChannelBindings(): array
+    {
+        return $this->allowedChannelBindings;
+    }
+
+    public function getMaxIterations(): int
+    {
+        return $this->maxIterations;
     }
 }

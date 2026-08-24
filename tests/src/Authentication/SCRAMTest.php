@@ -41,7 +41,7 @@ namespace Fabiang\SASL\Authentication;
 
 use PHPUnit\Framework\TestCase;
 use Fabiang\SASL\Options;
-use Fabiang\SASL\Options\DowngradeProtectionOptions;
+use Fabiang\SASL\Options\SCRAMOptions;
 use Fabiang\SASL\Exception\InvalidArgumentException;
 use Fabiang\SASL\Authentication\AbstractAuthentication;
 use PHPUnit\Framework\Attributes\Test;
@@ -52,7 +52,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 #[CoversClass(SCRAM::class)]
 #[CoversClass(AbstractAuthentication::class)]
 #[UsesClass(Options::class)]
-#[UsesClass(DowngradeProtectionOptions::class)]
+#[UsesClass(SCRAMOptions::class)]
 final class SCRAMTest extends TestCase
 {
     protected SCRAM $object;
@@ -175,7 +175,7 @@ final class SCRAMTest extends TestCase
 
         $this->assertMatchesRegularExpression(
             '#^c=[a-zA-Z0-9=+/]+,r=[a-zA-Z0-9=+/]+,p=[a-zA-Z0-9=+/]+$#',
-            $this->object->createResponse('r=' . $this->object->getCnonce() . ',s=abcdefg=,i=2,a=2')
+            $this->object->createResponse('r=' . $this->object->getCnonce() . ',s=abcdefg=,i=4096,a=2')
         );
 
         $this->assertMatchesRegularExpression('#^[a-zA-Z0-9=+/]+$#', $this->object->getCnonce());
@@ -192,7 +192,7 @@ final class SCRAMTest extends TestCase
     {
         $this->object->createResponse(null);
 
-        $this->assertFalse($this->object->createResponse('r=aaa,s=abcdefg=,i=1,a=2'));
+        $this->assertFalse($this->object->createResponse('r=aaa,s=abcdefg=,i=4096,a=2'));
     }
 
     #[Test]
@@ -204,13 +204,13 @@ final class SCRAMTest extends TestCase
             'zid',
             null,
             null,
-            new DowngradeProtectionOptions(['A'], ['B'])
+            new SCRAMOptions(['A'], ['B'])
         );
 
         $object = new SCRAM($options, 'md5');
 
         $object->createResponse(null);
-        $this->assertFalse($object->createResponse('r=' . $object->getCnonce() . ',s=abcdefg=,i=2,d=invalid=,a=2'));
+        $this->assertFalse($object->createResponse('r=' . $object->getCnonce() . ',s=abcdefg=,i=4096,d=invalid=,a=2'));
     }
 
     #[Test]
@@ -222,13 +222,13 @@ final class SCRAMTest extends TestCase
             'zid',
             null,
             null,
-            new DowngradeProtectionOptions(['A'], ['B'])
+            new SCRAMOptions(['A'], ['B'])
         );
 
         $object = new SCRAM($options, 'md5');
 
         $object->createResponse(null);
-        $this->assertFalse($object->createResponse('r=' . $object->getCnonce() . ',s=abcdefg=,i=2,h=invalid=,a=2'));
+        $this->assertFalse($object->createResponse('r=' . $object->getCnonce() . ',s=abcdefg=,i=4096,h=invalid=,a=2'));
     }
 
     #[Test]
@@ -238,7 +238,7 @@ final class SCRAMTest extends TestCase
         $object  = new SCRAM($options, 'md5');
 
         $object->createResponse(null);
-        $this->assertNotFalse($object->createResponse('r=' . $object->getCnonce() . ',s=abcdefg=,i=2,d=invalid=,a=2'));
+        $this->assertNotFalse($object->createResponse('r=' . $object->getCnonce() . ',s=abcdefg=,i=4096,d=invalid=,a=2'));
     }
 
     #[Test]
@@ -248,7 +248,38 @@ final class SCRAMTest extends TestCase
         $object  = new SCRAM($options, 'md5');
 
         $object->createResponse(null);
-        $this->assertNotFalse($object->createResponse('r=' . $object->getCnonce() . ',s=abcdefg=,i=2,h=invalid=,a=2'));
+        $this->assertNotFalse($object->createResponse('r=' . $object->getCnonce() . ',s=abcdefg=,i=4096,h=invalid=,a=2'));
+    }
+
+    #[Test]
+    public function createResponseIterationsToLow(): void
+    {
+        $options = new Options('test', 'pass', 'zid', null, null, null);
+        $object  = new SCRAM($options, 'md5');
+
+        $object->createResponse(null);
+        $this->assertFalse($object->createResponse('r=' . $object->getCnonce() . ',s=abcdefg=,i=4095,d=invalid=,a=2'));
+    }
+
+    #[Test]
+    public function createResponseIterationsToHighDefault(): void
+    {
+        $options = new Options('test', 'pass', 'zid', null, null, null);
+        $object  = new SCRAM($options, 'md5');
+
+        $object->createResponse(null);
+        $this->assertFalse($object->createResponse('r=' . $object->getCnonce() . ',s=abcdefg=,i=1000001,d=invalid=,a=2'));
+    }
+
+    #[Test]
+    public function createResponseIterationsToHighByOption(): void
+    {
+        $scramOptions = new SCRAMOptions([], [], 4097);
+        $options = new Options('test', 'pass', 'zid', null, null, $scramOptions);
+        $object  = new SCRAM($options, 'md5');
+
+        $object->createResponse(null);
+        $this->assertFalse($object->createResponse('r=' . $object->getCnonce() . ',s=abcdefg=,i=4097,d=invalid=,a=2'));
     }
 
     #[Test]
@@ -257,7 +288,7 @@ final class SCRAMTest extends TestCase
         $this->object->createResponse(null);
         $this->assertFalse(
             $this->object->createResponse(
-                'r=' . $this->object->getCnonce() . ',s=abcdefg=,i=2,m=test,a=2'
+                'r=' . $this->object->getCnonce() . ',s=abcdefg=,i=4096,m=test,a=2'
             )
         );
     }
@@ -268,7 +299,7 @@ final class SCRAMTest extends TestCase
         $this->object->createResponse(null);
         $this->assertFalse(
             $this->object->createResponse(
-                'r=' . $this->object->getCnonce() . ',s=,i=2'
+                'r=' . $this->object->getCnonce() . ',s=,i=4096'
             )
         );
     }
@@ -277,7 +308,19 @@ final class SCRAMTest extends TestCase
     public function verify(): void
     {
         $this->object->createResponse(null);
-        $this->object->createResponse('r=' . $this->object->getCnonce() . ',s=abcdefg=,i=2,a=2');
+        $this->object->createResponse('r=' . $this->object->getCnonce() . ',s=abcdefg=,i=4096,a=2');
+
+        $serverKey       = hash_hmac('md5', "Server Key", $this->object->getSaltedSecret(), true);
+        $serverSignature = hash_hmac('md5', $this->object->getAuthMessage(), $serverKey, true);
+
+        $this->assertTrue($this->object->verify('v=' . base64_encode($serverSignature)));
+    }
+    
+    #[Test]
+    public function verifyHighIterator(): void
+    {
+        $this->object->createResponse(null);
+        $this->object->createResponse('r=' . $this->object->getCnonce() . ',s=abcdefg=,i=1000000,a=2');
 
         $serverKey       = hash_hmac('md5', "Server Key", $this->object->getSaltedSecret(), true);
         $serverSignature = hash_hmac('md5', $this->object->getAuthMessage(), $serverKey, true);
@@ -289,7 +332,7 @@ final class SCRAMTest extends TestCase
     public function verifyWithExtraMAttr(): void
     {
         $this->object->createResponse(null);
-        $this->object->createResponse('r=' . $this->object->getCnonce() . ',s=abcdefg=,i=2,a=2');
+        $this->object->createResponse('r=' . $this->object->getCnonce() . ',s=abcdefg=,i=4096,a=2');
 
         $serverKey       = hash_hmac('md5', "Server Key", $this->object->getSaltedSecret(), true);
         $serverSignature = hash_hmac('md5', $this->object->getAuthMessage(), $serverKey, true);
