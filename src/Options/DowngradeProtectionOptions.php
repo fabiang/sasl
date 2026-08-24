@@ -44,7 +44,7 @@ use Deprecated;
 class DowngradeProtectionOptions extends SCRAMOptions
 {
     #[Deprecated("Class 'DowngradeProtectionOptions' is deprecated, use 'SCRAMOptions' instead.")]
-    public function __construct(array $allowedMechanisms, array $allowedChannelBindings) 
+    public function __construct(array $allowedMechanisms, array $allowedChannelBindings)
     {
         parent::__construct($allowedMechanisms, $allowedChannelBindings);
     }

@@ -238,7 +238,10 @@ final class SCRAMTest extends TestCase
         $object  = new SCRAM($options, 'md5');
 
         $object->createResponse(null);
-        $this->assertNotFalse($object->createResponse('r=' . $object->getCnonce() . ',s=abcdefg=,i=4096,d=invalid=,a=2'));
+        $this->assertNotFalse(
+            $object->createResponse('r=' . $object->getCnonce()
+                . ',s=abcdefg=,i=4096,d=invalid=,a=2')
+        );
     }
 
     #[Test]
@@ -248,7 +251,12 @@ final class SCRAMTest extends TestCase
         $object  = new SCRAM($options, 'md5');
 
         $object->createResponse(null);
-        $this->assertNotFalse($object->createResponse('r=' . $object->getCnonce() . ',s=abcdefg=,i=4096,h=invalid=,a=2'));
+        $this->assertNotFalse(
+            $object->createResponse(
+                'r=' . $object->getCnonce()
+                    . ',s=abcdefg=,i=4096,h=invalid=,a=2'
+            )
+        );
     }
 
     #[Test]
@@ -258,7 +266,10 @@ final class SCRAMTest extends TestCase
         $object  = new SCRAM($options, 'md5');
 
         $object->createResponse(null);
-        $this->assertFalse($object->createResponse('r=' . $object->getCnonce() . ',s=abcdefg=,i=4095,d=invalid=,a=2'));
+        $this->assertFalse(
+            $object->createResponse('r=' . $object->getCnonce()
+                . ',s=abcdefg=,i=4095,d=invalid=,a=2')
+        );
     }
 
     #[Test]
@@ -268,7 +279,10 @@ final class SCRAMTest extends TestCase
         $object  = new SCRAM($options, 'md5');
 
         $object->createResponse(null);
-        $this->assertFalse($object->createResponse('r=' . $object->getCnonce() . ',s=abcdefg=,i=1000001,d=invalid=,a=2'));
+        $this->assertFalse(
+            $object->createResponse('r=' . $object->getCnonce()
+                . ',s=abcdefg=,i=1000001,d=invalid=,a=2')
+        );
     }
 
     #[Test]
@@ -279,7 +293,10 @@ final class SCRAMTest extends TestCase
         $object  = new SCRAM($options, 'md5');
 
         $object->createResponse(null);
-        $this->assertFalse($object->createResponse('r=' . $object->getCnonce() . ',s=abcdefg=,i=4097,d=invalid=,a=2'));
+        $this->assertFalse(
+            $object->createResponse('r=' . $object->getCnonce()
+                . ',s=abcdefg=,i=4097,d=invalid=,a=2')
+        );
     }
 
     #[Test]
@@ -315,7 +332,7 @@ final class SCRAMTest extends TestCase
 
         $this->assertTrue($this->object->verify('v=' . base64_encode($serverSignature)));
     }
-    
+
     #[Test]
     public function verifyHighIterator(): void
     {

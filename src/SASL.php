@@ -130,7 +130,7 @@ enum SASL: string
             return $options;
         }
         
-        if (! isset($options['scram']) 
+        if (! isset($options['scram'])
             && isset($options['downgrade_protection'])) {
             trigger_error(
                 sprintf(
@@ -153,7 +153,7 @@ enum SASL: string
             $maxIterations = $scro['max_iterations'] ?? SCRAM::MAX_ITERATIONS;
 
             $scramOptions = new SCRAMOptions(
-                $allowedMechanisms, 
+                $allowedMechanisms,
                 $allowedChannelBindings,
                 intval($maxIterations)
             );
