@@ -300,6 +300,48 @@ final class SCRAMTest extends TestCase
     }
 
     #[Test]
+    public function createResponseDownGradeProcectionEmptyButIteratorParameterH(): void
+    {
+        $scramOptions = new SCRAMOptions([], [], 4096);
+        $options = new Options('test', 'pass', 'zid', null, null, $scramOptions);
+        $object  = new SCRAM($options, 'md5');
+
+        $object->createResponse(null);
+        $this->assertNotFalse(
+            $object->createResponse('r=' . $object->getCnonce()
+                . ',s=abcdefg=,i=4096,a=2')
+        );
+
+        $object->createResponse(null);
+        // + downgrade protection "h"
+        $this->assertFalse(
+            $object->createResponse('r=' . $object->getCnonce()
+                . ',s=abcdefg=,i=4096,a=2,h=test1\x1ftest2,d=test3|test4')
+        );
+    }
+
+    #[Test]
+    public function createResponseDownGradeProcectionEmptyButIteratorParameterD(): void
+    {
+        $scramOptions = new SCRAMOptions([], [], 4096);
+        $options = new Options('test', 'pass', 'zid', null, null, $scramOptions);
+        $object  = new SCRAM($options, 'md5');
+
+        $object->createResponse(null);
+        $this->assertNotFalse(
+            $object->createResponse('r=' . $object->getCnonce()
+                . ',s=abcdefg=,i=4096,a=2')
+        );
+
+        $object->createResponse(null);
+        // + downgrade protection "d"
+        $this->assertFalse(
+            $object->createResponse('r=' . $object->getCnonce()
+                . ',s=abcdefg=,i=4096,a=2,d=test3|test4')
+        );
+    }
+
+    #[Test]
     public function createResponseExtraMAttr(): void
     {
         $this->object->createResponse(null);
@@ -362,7 +404,6 @@ final class SCRAMTest extends TestCase
     {
         $this->assertFalse($this->object->verify(''));
     }
-
 
     #[Test]
     public function saltedSecretNull(): void

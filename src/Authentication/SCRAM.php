@@ -45,6 +45,8 @@ use Fabiang\SASL\Exception\InvalidArgumentException;
 use SensitiveParameterValue;
 use Override;
 
+use function hash_equals;
+
 /**
  * Implementation of SCRAM-* SASL mechanisms.
  * SCRAM mechanisms have 3 main steps (initial response, response to the server challenge, then server signature
@@ -221,7 +223,7 @@ class SCRAM extends AbstractAuthentication implements ChallengeAuthenticationInt
         $maxIterations = $this->getOptions()
             ->getSCRAMOptions()
             ?->getMaxIterations() ?? static::MAX_ITERATIONS;
- 
+
         if ($i < static::MIN_ITERATIONS) {
             return false;
         }
@@ -268,16 +270,30 @@ class SCRAM extends AbstractAuthentication implements ChallengeAuthenticationInt
         string $groupDelimiter,
         string $delimiter
     ): bool {
-        if ($this->options->getSCRAMOptions() === null) {
+        $scramOptions = $this->options->getSCRAMOptions();
+        if ($scramOptions === null) {
             return true;
         }
 
-        $actualDgPHash = base64_encode(
-            $this->hash(
-                $this->generateDowngradeProtectionVerification($groupDelimiter, $delimiter)
-            )
-        );
-        return $expectedDowngradeProtectionHash === $actualDgPHash;
+        $allowedMechanisms      = $scramOptions->getAllowedMechanisms();
+        $allowedChannelBindings = $scramOptions->getAllowedChannelBindings();
+
+        // if both are emtpy we return true, nevertheless a mechanism/binding was provided
+        if (count($allowedMechanisms) === 0 && count($allowedChannelBindings) === 0) {
+            return false;
+        }
+
+        usort($allowedMechanisms, $this->sortOctetCollation(...));
+        usort($allowedChannelBindings, $this->sortOctetCollation(...));
+
+        $protect = implode($delimiter, $allowedMechanisms);
+        if (count($allowedChannelBindings) > 0) {
+            $protect .= $groupDelimiter . implode($delimiter, $allowedChannelBindings);
+        }
+
+        $actualDgPHash = base64_encode($this->hash($protect));
+
+        return hash_equals($actualDgPHash, $expectedDowngradeProtectionHash);
     }
 
     /**
@@ -285,7 +301,7 @@ class SCRAM extends AbstractAuthentication implements ChallengeAuthenticationInt
      *
      * @param string $str  The string to hash.
      * @param string $salt The salt value.
-     * @param int $i The   iteration count.
+     * @param int $i The   Iteration count. Make sure it's between MIN_ITERATIONS/MAX_ITERATIONS
      */
     private function hi(
         #[\SensitiveParameter]
@@ -339,7 +355,7 @@ class SCRAM extends AbstractAuthentication implements ChallengeAuthenticationInt
         $serverKey               = $this->hmac($saltedSecret, "Server Key", true);
         $serverSignature         = $this->hmac($serverKey, $this->authMessage, true);
 
-        return $proposedServerSignature === $serverSignature;
+        return hash_equals($serverSignature, $proposedServerSignature);
     }
 
     private function parseAdditionalAttributes(string $addAttr): array

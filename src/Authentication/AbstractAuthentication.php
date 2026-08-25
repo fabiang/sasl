@@ -92,36 +92,9 @@ abstract class AbstractAuthentication
     }
 
     /**
-     * Generate downgrade protection string
-     */
-    protected function generateDowngradeProtectionVerification(string $groupDelimiter, string $delimiter): string
-    {
-        $scramOptions = $this->options->getSCRAMOptions();
-        if ($scramOptions === null) {
-            return '';
-        }
-
-        $allowedMechanisms      = $scramOptions->getAllowedMechanisms();
-        $allowedChannelBindings = $scramOptions->getAllowedChannelBindings();
-
-        if (count($allowedMechanisms) === 0 && count($allowedChannelBindings) === 0) {
-            return '';
-        }
-
-        usort($allowedMechanisms, $this->sortOctetCollation(...));
-        usort($allowedChannelBindings, $this->sortOctetCollation(...));
-
-        $protect = implode($delimiter, $allowedMechanisms);
-        if (count($allowedChannelBindings) > 0) {
-            $protect .= $groupDelimiter . implode($delimiter, $allowedChannelBindings);
-        }
-        return $protect;
-    }
-
-    /**
      * @link https://datatracker.ietf.org/doc/html/rfc4790#page-22
      */
-    private function sortOctetCollation(string $a, string $b): int
+    protected function sortOctetCollation(string $a, string $b): int
     {
         if ($a == $b) {
             return 0;
