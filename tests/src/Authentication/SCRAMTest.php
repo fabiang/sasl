@@ -48,11 +48,13 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Medium;
 
 #[CoversClass(SCRAM::class)]
 #[CoversClass(AbstractAuthentication::class)]
 #[UsesClass(Options::class)]
 #[UsesClass(SCRAMOptions::class)]
+#[Medium]
 final class SCRAMTest extends TestCase
 {
     protected SCRAM $object;

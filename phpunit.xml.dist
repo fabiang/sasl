@@ -47,7 +47,8 @@
          displayDetailsOnPhpunitDeprecations="true"
          failOnPhpunitDeprecation="true"
          failOnRisky="true"
-         failOnWarning="true">
+         failOnWarning="true"
+         enforceTimeLimit="true">
     <testsuites>
         <testsuite name="default">
             <directory>tests</directory>
